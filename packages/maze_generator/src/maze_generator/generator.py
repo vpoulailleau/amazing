@@ -72,12 +72,10 @@ class MazeCarver:
         self,
         maze: Maze,
         possible_walls: list[WallToRemove],
-        dsu: DisjointSet,
     ) -> None:
         """Initialize carver state."""
         self.maze = maze
         self.possible_walls = possible_walls
-        self.dsu = dsu
 
     def carve(self) -> None:
         """Carve walls until the target condition is reached."""
@@ -86,6 +84,7 @@ class MazeCarver:
             self.maze.width - 1, self.maze.height - 1, self.maze.width
         )
         min_open_edges = max(1, (self.maze.width * self.maze.height) // 3)
+        dsu = DisjointSet(self.maze.width * self.maze.height)
         open_edges = 0
         for wall in self.possible_walls:
             neighbors = _wall_neighbors(wall, self.maze.width, self.maze.height)
@@ -94,7 +93,7 @@ class MazeCarver:
 
             idx_a = _cell_index(neighbors[0][0], neighbors[0][1], self.maze.width)
             idx_b = _cell_index(neighbors[1][0], neighbors[1][1], self.maze.width)
-            if self.dsu.find(idx_a) == self.dsu.find(idx_b):
+            if dsu.find(idx_a) == dsu.find(idx_b):
                 continue
 
             if wall.is_top:
@@ -102,11 +101,11 @@ class MazeCarver:
             else:
                 self.maze.walls[wall.x][wall.y].left = False
 
-            self.dsu.union(idx_a, idx_b)
+            dsu.union(idx_a, idx_b)
             open_edges += 1
 
             if (
-                self.dsu.find(start_node) == self.dsu.find(end_node)
+                dsu.find(start_node) == dsu.find(end_node)
                 and open_edges >= min_open_edges
             ):
                 return
@@ -133,12 +132,9 @@ def generate_maze(
 
     random.shuffle(possible_walls)
 
-    dsu = DisjointSet(width * height)
-
     MazeCarver(
         maze=maze,
         possible_walls=possible_walls,
-        dsu=dsu,
     ).carve()
 
     min_paths = 10
