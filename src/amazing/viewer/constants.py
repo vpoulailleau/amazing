@@ -1,11 +1,16 @@
+"""Viewer constants and size presets."""
+
 import colorsys
 import math
+from typing import ClassVar
 
 
 class Constants:
+    """Container for viewer layout and color constants."""
+
     SCREEN_TITLE = "Amazing Viewer"
-    TEAM_HUES = {0: 0, 1: 30, 2: 65, 3: 120}
-    TEAM_COLORS = {
+    TEAM_HUES: ClassVar[dict[int, int]] = {0: 0, 1: 30, 2: 65, 3: 120}
+    TEAM_COLORS: ClassVar[dict[int, tuple[int, int, int]]] = {
         team: tuple(
             int(c * 255)
             for c in colorsys.hsv_to_rgb(((hue * math.pi / 2) % 360) / 360, 1, 1)
@@ -13,7 +18,8 @@ class Constants:
         for team, hue in TEAM_HUES.items()
     }
 
-    def resize(self, small_window: bool):
+    def resize(self, *, small_window: bool) -> None:
+        """Apply either normal or small-window screen layout values."""
         if not small_window:
             self.SCREEN_WIDTH = 1777
             self.SCREEN_HEIGHT = 1000

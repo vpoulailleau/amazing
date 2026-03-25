@@ -1,9 +1,12 @@
+"""CLI entrypoint for launching the Amazing viewer."""
+
 import argparse
 import logging
 
-from amazing.viewer.viewer import Viewer
 from amazing.viewer.constants import constants
+from amazing.viewer.viewer import Viewer
 
+logger = logging.getLogger(__name__)
 
 parser = argparse.ArgumentParser(description="Game client.")
 parser.add_argument(
@@ -33,11 +36,11 @@ logging.basicConfig(
     ),
     datefmt="%m/%d/%Y %H:%M:%S",
 )
-logging.info("Launching viewer")
+logger.info("Launching viewer")
 
 
 try:
-    constants.resize(args.small_window)
+    constants.resize(small_window=args.small_window)
     Viewer(args.address, args.port)
-except Exception:  # noqa: PIE786,PLW718
-    logging.exception("uncaught exception")
+except Exception:
+    logger.exception("uncaught exception")

@@ -1,3 +1,5 @@
+"""TCP server for handling game client connections."""
+
 import argparse
 import logging
 from contextlib import suppress
@@ -8,26 +10,43 @@ from typing import NoReturn
 
 from .data_handler import DataHandler
 
+logger = logging.getLogger(__name__)
+
 
 @dataclass
 class ClientData:
+    """Runtime information for a connected client."""
+
     spectator: bool
     name: str
     network: DataHandler
 
     def __eq__(self: ClientData, other: object) -> bool:
+        """Compare two clients by their underlying network handler identity.
+
+        Returns:
+            True when both instances wrap the same network handler.
+        """
         if isinstance(other, ClientData):
             return self.network is other.network
         raise NotImplementedError
 
     def __hash__(self: ClientData) -> int:
+        """Hash client data from the underlying network handler identity.
+
+        Returns:
+            Stable hash derived from the network handler object identity.
+        """
         return id(self.network)
 
 
 class Server:
+    """Accept and track incoming clients for the game server."""
+
     def __init__(self: Server, host: str, port: int) -> None:
+        """Start server accept loop in a background thread."""
         self.clients: list[ClientData] = []
-        print("Waiting for connection...")
+        logger.info("Waiting for connection...")
         accept_thread = Thread(
             target=self.accept_incoming_connections, args=(host, port), daemon=True
         )
@@ -59,17 +78,17 @@ class Server:
         Args:
             client_socket (socket): socket of the client to handle
         """
-        print("Connection of a new client", flush=True)
+        logger.info("Connection of a new client")
         data_handler = DataHandler(client_socket)
         spectator = data_handler.readline().strip() == "1"
-        print(" - Spectator", spectator)
+        logger.info(" - Spectator %s", spectator)
         name = data_handler.readline().strip()
-        print(" - Name", name)
+        logger.info(" - Name %s", name)
         client = ClientData(spectator=spectator, name=name, network=data_handler)
         self.clients.append(client)
         client.network.write("OK\n")
-        logging.info(self.clients)
-        print(" - New client connected", client, flush=True)
+        logger.info("Current clients: %s", self.clients)
+        logger.info(" - New client connected %s", client)
 
 
 if __name__ == "__main__":

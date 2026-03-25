@@ -1,3 +1,5 @@
+"""TCP client for Amazing server communication."""
+
 import argparse
 from socket import AF_INET, SOCK_STREAM, socket
 
@@ -5,9 +7,21 @@ from .data_handler import DEFAULT_TIMEOUT, DataHandler
 
 
 class Client:
+    """Game client wrapper around a socket data handler."""
+
     def __init__(
-        self, server_addr: str, port: int, username: str = "", spectator: bool = True
+        self,
+        server_addr: str,
+        port: int,
+        username: str = "",
+        *,
+        spectator: bool = True,
     ) -> None:
+        """Connect to the server and perform the client handshake.
+
+        Raises:
+            ConnectionRefusedError: If server does not acknowledge the handshake.
+        """
         sock = socket(AF_INET, SOCK_STREAM)
         sock.connect((server_addr, port))
         self._data_handler = DataHandler(sock)
@@ -20,21 +34,32 @@ class Client:
         self.send(f"{self.username}\n")
 
         line = self._data_handler.readline()
-        if line == "OK":
-            pass  # successful connection
-        else:
-            raise ConnectionRefusedError("Connection refused by server", line)
+        if line != "OK":
+            message = f"Connection refused by server: {line}"
+            raise ConnectionRefusedError(message)
 
     def send(self, message: str) -> None:
+        """Send a text message to the server."""
         self._data_handler.write(message)
 
     def send_json(self, data: object) -> None:
+        """Send a JSON payload to the server."""
         self._data_handler.write_json(data)
 
     def read_json(self, timeout: int = DEFAULT_TIMEOUT) -> object:
+        """Read a JSON payload from the server.
+
+        Returns:
+            Decoded JSON payload from the server.
+        """
         return self._data_handler.read_json(timeout)
 
     def readline(self, timeout: int = DEFAULT_TIMEOUT) -> str:
+        """Read one newline-terminated line from the server.
+
+        Returns:
+            Received text line without the trailing newline.
+        """
         return self._data_handler.readline(timeout)
 
 

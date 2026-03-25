@@ -1,20 +1,28 @@
+"""Socket-based line and JSON I/O helpers for network communication."""
+
 from __future__ import annotations
 
 import json
 import logging
 from contextlib import suppress
-from socket import socket
 from threading import Lock, Thread
 from time import perf_counter, sleep
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from socket import socket as socket_type
 
 DEFAULT_TIMEOUT = 20  # seconds
+logger = logging.getLogger(__name__)
 
 
 class NetworkError(Exception):
-    pass
+    """Raised when network I/O times out or connection is broken."""
 
 
 class DataHandler:
+    """Asynchronous buffered socket reader/writer with line and JSON helpers."""
+
     BUFSIZ = 1024
 
     def _receive_data(self) -> None:
@@ -33,7 +41,8 @@ class DataHandler:
                 except UnicodeDecodeError:
                     pass
 
-    def __init__(self, socket_: socket) -> None:
+    def __init__(self, socket_: socket_type) -> None:
+        """Initialize handler and start background receive thread."""
         self._inputbytes = b""
         self._input = ""
         self._input_lock = Lock()
@@ -44,13 +53,22 @@ class DataHandler:
         receive_thread.start()
 
     def input_empty(self) -> bool:
+        """Return True when no complete line is currently buffered."""
         return "\n" not in self._input
 
     def readline(self: DataHandler, timeout: int = DEFAULT_TIMEOUT) -> str:
+        """Read one line from the socket within the timeout window.
+
+        Returns:
+            The next complete line without trailing newline.
+
+        Raises:
+            NetworkError: If no complete line is received before timeout.
+        """
         start = perf_counter()
         while "\n" not in self._input:
             if perf_counter() - start > timeout:
-                logging.debug("timeout")
+                logger.debug("timeout")
                 raise NetworkError
             sleep(0.005)
         with self._input_lock:
@@ -60,23 +78,37 @@ class DataHandler:
             return line
 
     def read_json(self: DataHandler, timeout: int = DEFAULT_TIMEOUT) -> object:
+        """Read and decode one JSON object within the timeout window.
+
+        Returns:
+            Decoded JSON-compatible Python object.
+
+        Raises:
+            NetworkError: If no valid JSON payload is received before timeout.
+        """
         start = perf_counter()
-        logging.debug("read_json")
+        logger.debug("read_json")
         json_text = ""
         while True:
             json_text += "\n" + self.readline(timeout)
             with suppress(json.JSONDecodeError):
                 return json.loads(json_text)
             if perf_counter() - start > timeout:
-                logging.debug("timeout")
+                logger.debug("timeout")
                 raise NetworkError
 
     def write(self: DataHandler, message: str) -> None:
-        logging.debug("write %s", message[:100])
+        """Send a text message to the socket.
+
+        Raises:
+            NetworkError: If the remote side has closed the connection.
+        """
+        logger.debug("write %s", message[:100])
         try:
             self.socket.send(bytes(message, "utf8"))
         except BrokenPipeError as exc:
             raise NetworkError from exc
 
     def write_json(self, data: object) -> None:
+        """Serialize and send JSON data followed by a newline."""
         self.write(json.dumps(data) + "\n")
