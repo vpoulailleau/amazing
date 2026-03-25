@@ -40,7 +40,7 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.uv]
-dev-dependencies = ["pytest", "ruff", "prek", "ty"]
+dev-dependencies = ["pytest", "ruff", "ty"]
 package = false
 
 [tool.uv.workspace]
