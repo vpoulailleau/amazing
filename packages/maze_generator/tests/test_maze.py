@@ -122,3 +122,19 @@ def test_paths_count_simple_maze_with_walls() -> None:
     maze.walls[2][1].left = True
     all_paths = maze.paths(0, 0, 2, 2)
     assert len(all_paths) == 2
+
+
+def test_maze_is_connected() -> None:
+    """Test connectivity check between start and end."""
+    maze = Maze(width=2, height=2)
+    # Initially, no paths
+    assert not maze.is_connected(0, 0, 1, 1)
+
+    # Open some walls
+    for y in range(maze.height + 1):
+        for x in range(maze.width + 1):
+            maze.walls[x][y].top = False
+            maze.walls[x][y].left = False
+
+    # Now connected
+    assert maze.is_connected(0, 0, 1, 1)

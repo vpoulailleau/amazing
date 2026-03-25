@@ -1,6 +1,6 @@
 """Maze data structure for maze generator."""
 
-from collections import UserList
+from collections import UserList, deque
 from typing import NamedTuple
 
 from .cell import Cell
@@ -153,3 +153,50 @@ class Maze:
 
         dfs(start_x, start_y)
         return result
+
+    def is_connected(
+        self,
+        start_x: int,
+        start_y: int,
+        end_x: int,
+        end_y: int,
+    ) -> bool:
+        """Check if there is a path from start to end in the maze.
+
+        Args:
+            start_x: start column (0-based)
+            start_y: start row (0-based)
+            end_x: end column (0-based)
+            end_y: end row (0-based)
+
+        Returns:
+            True if end is reachable from start, False otherwise.
+
+        Raises:
+            ValueError: if any coordinate is outside the maze bounds.
+        """
+        if not (0 <= start_x < self.width and 0 <= start_y < self.height):
+            msg = "start coordinates out of maze bounds"
+            raise ValueError(msg)
+
+        if not (0 <= end_x < self.width and 0 <= end_y < self.height):
+            msg = "end coordinates out of maze bounds"
+            raise ValueError(msg)
+
+        if (start_x, start_y) == (end_x, end_y):
+            return True
+
+        visited = set()
+        queue = deque([(start_x, start_y)])
+        visited.add((start_x, start_y))
+
+        while queue:
+            x, y = queue.popleft()
+            for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+                if (nx, ny) == (end_x, end_y):
+                    return True
+                if (nx, ny) not in visited and self._can_move(x, y, nx, ny):
+                    visited.add((nx, ny))
+                    queue.append((nx, ny))
+
+        return False
