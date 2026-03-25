@@ -12,6 +12,9 @@ members = [
 name = "amazing-workspace"
 version = "0.1.0"
 source = { virtual = "." }
+dependencies = [
+    { name = "maze-generator" },
+]
 
 [package.dev-dependencies]
 dev = [
@@ -22,6 +25,7 @@ dev = [
 ]
 
 [package.metadata]
+requires-dist = [{ name = "maze-generator", editable = "packages/maze_generator" }]
 
 [package.metadata.requires-dev]
 dev = [

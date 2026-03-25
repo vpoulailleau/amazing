@@ -117,27 +117,27 @@ ruff format src/ tests/
 
 - [ ] **Tests exist and pass**
   ```bash
-  pytest tests/ -v
+  uv run python -m pytest tests/ -v
   ```
 
 - [ ] **Linter passes with no errors**
   ```bash
-  ruff check src/ tests/
+  uv run ruff check src/ tests/
   ```
 
 - [ ] **Type checking passes**
   ```bash
-  ty src/
+  uv run ty check .
   ```
 
 - [ ] **Code is formatted**
   ```bash
-  ruff format --check src/ tests/
+  uv run ruff format --check src/ tests/
   ```
 
 - [ ] **Test coverage is adequate** (target: >80%)
   ```bash
-  pytest --cov=src tests/
+  uv run python -m pytest --cov=src tests/
   ```
 
 - [ ] **Docstrings are present**

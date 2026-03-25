@@ -2,7 +2,10 @@
 name = "amazing-workspace"
 version = "0.1.0"
 requires-python = ">=3.14"
-dependencies = []
+dependencies = ["maze-generator"]
+
+[tool.uv.sources]
+maze-generator = { workspace = true }
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
