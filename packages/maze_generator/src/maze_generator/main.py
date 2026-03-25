@@ -1,6 +1,6 @@
 """Main entry point for maze-generator."""
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from maze_generator import generate_maze
 
@@ -15,7 +15,7 @@ def main() -> None:
     print(maze)  # noqa: T201
     print(f"Number of paths from (0, 0) to (29, 29): {len(paths)}")  # noqa: T201
     if paths:
-        shortest_path = min(paths, key=len)
+        shortest_path = cast("Path", min(paths, key=len))
         print("Example path:", shortest_path)  # noqa: T201
         print(maze.highlighted_path(shortest_path))  # noqa: T201
 
