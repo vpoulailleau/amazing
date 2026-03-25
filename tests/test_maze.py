@@ -1,5 +1,7 @@
 """Tests for maze_generator.maze module."""
 
+import pytest
+
 from amazing.game.cell import Cell
 from amazing.game.maze import CellCoord, Maze, Path
 
@@ -138,3 +140,27 @@ def test_maze_is_connected() -> None:
 
     # Now connected
     assert maze.is_connected(0, 0, 1, 1)
+
+
+def test_paths_raises_for_out_of_bounds_coordinates() -> None:
+    """Paths should raise ValueError for invalid start/end coordinates."""
+    maze = Maze(width=2, height=2)
+    with pytest.raises(ValueError, match="start coordinates out of maze bounds"):
+        maze.paths(-1, 0, 1, 1)
+    with pytest.raises(ValueError, match="end coordinates out of maze bounds"):
+        maze.paths(0, 0, 2, 1)
+
+
+def test_is_connected_raises_for_out_of_bounds_coordinates() -> None:
+    """Connectivity should raise ValueError for invalid start/end coordinates."""
+    maze = Maze(width=2, height=2)
+    with pytest.raises(ValueError, match="start coordinates out of maze bounds"):
+        maze.is_connected(-1, 0, 1, 1)
+    with pytest.raises(ValueError, match="end coordinates out of maze bounds"):
+        maze.is_connected(0, 0, 2, 1)
+
+
+def test_is_connected_start_equals_end_is_true() -> None:
+    """Connectivity is always true when start and end are the same cell."""
+    maze = Maze(width=2, height=2)
+    assert maze.is_connected(1, 1, 1, 1)
