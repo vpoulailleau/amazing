@@ -65,50 +65,33 @@ def _cell_index(x: int, y: int, width: int) -> int:
     return y * width + x
 
 
-class MazeCarver:
-    """Encapsulate wall carving with union-find and open-edge threshold."""
+def carve(maze: Maze, possible_walls: list[WallToRemove]) -> None:
+    """Carve walls until the target condition is reached."""
+    start_node = _cell_index(0, 0, maze.width)
+    end_node = _cell_index(maze.width - 1, maze.height - 1, maze.width)
+    min_open_edges = max(1, (maze.width * maze.height) // 3)
+    dsu = DisjointSet(maze.width * maze.height)
+    open_edges = 0
+    for wall in possible_walls:
+        neighbors = _wall_neighbors(wall, maze.width, maze.height)
+        if neighbors[0] is None or neighbors[1] is None:
+            continue
 
-    def __init__(
-        self,
-        maze: Maze,
-        possible_walls: list[WallToRemove],
-    ) -> None:
-        """Initialize carver state."""
-        self.maze = maze
-        self.possible_walls = possible_walls
+        idx_a = _cell_index(neighbors[0][0], neighbors[0][1], maze.width)
+        idx_b = _cell_index(neighbors[1][0], neighbors[1][1], maze.width)
+        if dsu.find(idx_a) == dsu.find(idx_b):
+            continue
 
-    def carve(self) -> None:
-        """Carve walls until the target condition is reached."""
-        start_node = _cell_index(0, 0, self.maze.width)
-        end_node = _cell_index(
-            self.maze.width - 1, self.maze.height - 1, self.maze.width
-        )
-        min_open_edges = max(1, (self.maze.width * self.maze.height) // 3)
-        dsu = DisjointSet(self.maze.width * self.maze.height)
-        open_edges = 0
-        for wall in self.possible_walls:
-            neighbors = _wall_neighbors(wall, self.maze.width, self.maze.height)
-            if neighbors[0] is None or neighbors[1] is None:
-                continue
+        if wall.is_top:
+            maze.walls[wall.x][wall.y].top = False
+        else:
+            maze.walls[wall.x][wall.y].left = False
 
-            idx_a = _cell_index(neighbors[0][0], neighbors[0][1], self.maze.width)
-            idx_b = _cell_index(neighbors[1][0], neighbors[1][1], self.maze.width)
-            if dsu.find(idx_a) == dsu.find(idx_b):
-                continue
+        dsu.union(idx_a, idx_b)
+        open_edges += 1
 
-            if wall.is_top:
-                self.maze.walls[wall.x][wall.y].top = False
-            else:
-                self.maze.walls[wall.x][wall.y].left = False
-
-            dsu.union(idx_a, idx_b)
-            open_edges += 1
-
-            if (
-                dsu.find(start_node) == dsu.find(end_node)
-                and open_edges >= min_open_edges
-            ):
-                return
+        if dsu.find(start_node) == dsu.find(end_node) and open_edges >= min_open_edges:
+            return
 
 
 def generate_maze(
@@ -131,11 +114,7 @@ def generate_maze(
                 possible_walls.append(WallToRemove(x=x + 1, y=y, is_top=False))
 
     random.shuffle(possible_walls)
-
-    MazeCarver(
-        maze=maze,
-        possible_walls=possible_walls,
-    ).carve()
+    carve(maze, possible_walls)
 
     min_paths = 10
     for wall in possible_walls:
