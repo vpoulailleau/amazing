@@ -167,6 +167,7 @@ ruff format src/ tests/
 - [ ] Functions are small and focused (<20 lines preferred)
 - [ ] No deep nesting (max 3 levels)
 - [ ] DRY principle followed (no code duplication)
+- [ ] Tests are in functions, not class methods
 
 ### Functionality
 - [ ] All tests pass
