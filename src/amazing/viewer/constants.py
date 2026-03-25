@@ -1,6 +1,5 @@
-import math
-
 import colorsys
+import math
 
 
 class Constants:

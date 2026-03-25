@@ -1,7 +1,7 @@
 import argparse
 from socket import AF_INET, SOCK_STREAM, socket
 
-from .data_handler import DataHandler, DEFAULT_TIMEOUT
+from .data_handler import DEFAULT_TIMEOUT, DataHandler
 
 
 class Client:

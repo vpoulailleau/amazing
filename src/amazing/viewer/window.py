@@ -1,3 +1,5 @@
+"""Window and GUI thread for the Arcade viewer."""
+
 import logging
 from importlib.resources import files
 from queue import Queue
@@ -8,10 +10,14 @@ from amazing.viewer.animation import set_date
 from amazing.viewer.constants import constants
 
 input_queue: Queue = Queue()
+logger = logging.getLogger(__name__)
 
 
 class Window(arcade.Window):
-    def __init__(self, addr: str, port: int) -> None:
+    """Main Arcade window for rendering the maze viewer."""
+
+    def __init__(self, _addr: str, _port: int) -> None:
+        """Initialize the window and background assets."""
         super().__init__(
             constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT, constants.SCREEN_TITLE
         )
@@ -22,6 +28,7 @@ class Window(arcade.Window):
         self.background_sprites = arcade.SpriteList()
 
     def setup(self) -> None:
+        """Build the tiled background sprite list once at startup."""
         base_texture = self.background_texture.texture
         tile_width = int(self.background_texture.width)
         tile_height = int(self.background_texture.height)
@@ -45,6 +52,7 @@ class Window(arcade.Window):
             y += tile_height
 
     def on_draw(self) -> None:
+        """Render one frame of the viewer."""
         if not input_queue.empty():
             data = input_queue.get()
             date_server = data["time"]
@@ -55,9 +63,10 @@ class Window(arcade.Window):
 
 
 def gui_thread(addr: str, port: int) -> None:
+    """Run the viewer event loop in a dedicated GUI thread."""
     window = Window(addr, port)
     try:
         window.setup()
         arcade.run()
     except Exception:
-        logging.exception("uncaught exception")
+        logger.exception("uncaught exception")

@@ -89,6 +89,7 @@ ruff check --fix src/ tests/
 - No noqa comments without justification
 - No warnings/errors without justification
 - No modification of `tool.ruff.lint.extend-per-file-ignores` in `pyproject.toml` without approval
+- No modification of `tool.ruff.lint.ignore` in `pyproject.toml` without approval
 
 ### Type Checking
 ```bash

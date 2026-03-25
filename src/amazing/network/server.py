@@ -15,17 +15,17 @@ class ClientData:
     name: str
     network: DataHandler
 
-    def __eq__(self: "ClientData", other: object) -> bool:
+    def __eq__(self: ClientData, other: object) -> bool:
         if isinstance(other, ClientData):
             return self.network is other.network
         raise NotImplementedError
 
-    def __hash__(self: "ClientData") -> int:
+    def __hash__(self: ClientData) -> int:
         return id(self.network)
 
 
 class Server:
-    def __init__(self: "Server", host: str, port: int) -> None:
+    def __init__(self: Server, host: str, port: int) -> None:
         self.clients: list[ClientData] = []
         print("Waiting for connection...")
         accept_thread = Thread(
@@ -33,7 +33,7 @@ class Server:
         )
         accept_thread.start()
 
-    def accept_incoming_connections(self: "Server", host: str, port: int) -> NoReturn:
+    def accept_incoming_connections(self: Server, host: str, port: int) -> NoReturn:
         """Set up handling for incoming clients.
 
         Args:
