@@ -88,6 +88,7 @@ ruff check --fix src/ tests/
 - Type hints for public APIs
 - No noqa comments without justification
 - No warnings/errors without justification
+- No modification of `tool.ruff.lint.extend-per-file-ignores` in `pyproject.toml` without approval
 
 ### Type Checking
 ```bash

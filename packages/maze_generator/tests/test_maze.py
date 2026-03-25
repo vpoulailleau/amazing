@@ -53,3 +53,37 @@ def test_maze_perimeter_walls_are_present() -> None:
     # Bottom row should have top walls
     for col in range(maze.width + 1):
         assert maze.walls[maze.height][col].top is True
+
+
+def test_nb_paths_is_zero_when_walls_block_path() -> None:
+    """Count is zero when there is no open passage."""
+    maze = Maze(width=2, height=2)
+    assert maze.nb_paths(0, 0, 1, 1) == 0
+
+
+def test_nb_paths_count_simple_open_maze() -> None:
+    """Count paths on a fully opened 2x2 maze."""
+    maze = Maze(width=2, height=2)
+    for row in range(maze.height + 1):
+        for col in range(maze.width + 1):
+            maze.walls[row][col].top = False
+            maze.walls[row][col].left = False
+
+    assert maze.nb_paths(0, 0, 1, 1) == 2
+
+
+def test_nb_paths_start_equals_end() -> None:
+    """Start equals end should produce exactly one path."""
+    maze = Maze(width=2, height=2)
+    assert maze.nb_paths(0, 0, 0, 0) == 1
+
+
+def test_nb_paths_count_simple_maze() -> None:
+    """Count paths on a fully opened 3x3 maze."""
+    maze = Maze(width=3, height=3)
+    for row in range(maze.height + 1):
+        for col in range(maze.width + 1):
+            maze.walls[row][col].top = False
+            maze.walls[row][col].left = False
+
+    assert maze.nb_paths(0, 0, 1, 1) == 8

@@ -28,3 +28,78 @@ class Maze:
             for _ in range(width + 1):  # +1 for hidden column
                 # Each cell has top and left walls
                 self.walls[row].append(Cell(top=True, left=True))
+
+    def nb_paths(
+        self,
+        start_x: int,
+        start_y: int,
+        end_x: int,
+        end_y: int,
+    ) -> int:
+        """Count simple paths from start to end in the maze.
+
+        Only paths that do not revisit a cell are counted.
+
+        Args:
+            start_x: start column (0-based)
+            start_y: start row (0-based)
+            end_x: end column (0-based)
+            end_y: end row (0-based)
+
+        Returns:
+            Number of distinct simple paths from start to end.
+
+        Raises:
+            ValueError: if any coordinate is outside the maze bounds.
+        """
+        if not (0 <= start_x < self.width and 0 <= start_y < self.height):
+            msg = "start coordinates out of maze bounds"
+            raise ValueError(msg)
+
+        if not (0 <= end_x < self.width and 0 <= end_y < self.height):
+            msg = "end coordinates out of maze bounds"
+            raise ValueError(msg)
+
+        if (start_x, start_y) == (end_x, end_y):
+            return 1
+
+        return self._count_paths(start_x, start_y, end_x, end_y)
+
+    def _can_move(self, x: int, y: int, nx: int, ny: int) -> bool:
+        if nx < 0 or nx >= self.width or ny < 0 or ny >= self.height:
+            return False
+
+        if nx == x - 1 and ny == y:
+            return not self.walls[y][x].left
+        if nx == x + 1 and ny == y:
+            return not self.walls[y][x + 1].left
+        if nx == x and ny == y - 1:
+            return not self.walls[y][x].top
+        if nx == x and ny == y + 1:
+            return not self.walls[y + 1][x].top
+
+        return False
+
+    def _count_paths(
+        self,
+        start_x: int,
+        start_y: int,
+        end_x: int,
+        end_y: int,
+    ) -> int:
+        visited: set[tuple[int, int]] = set()
+
+        def dfs(x: int, y: int) -> int:
+            if (x, y) == (end_x, end_y):
+                return 1
+
+            visited.add((x, y))
+            total = 0
+            for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):
+                if (nx, ny) not in visited and self._can_move(x, y, nx, ny):
+                    total += dfs(nx, ny)
+
+            visited.remove((x, y))
+            return total
+
+        return dfs(start_x, start_y)
