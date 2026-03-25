@@ -22,6 +22,7 @@ class Window(arcade.Window):
         self.background_sprites = arcade.SpriteList()
 
     def setup(self) -> None:
+        base_texture = self.background_texture.texture
         tile_width = int(self.background_texture.width)
         tile_height = int(self.background_texture.height)
 
@@ -33,13 +34,10 @@ class Window(arcade.Window):
         while y < self.height + tile_height:
             x = tile_width // 2
             while x < self.width + tile_width:
-                tile_sprite = arcade.Sprite(
-                    str(
-                        files("amazing.viewer.resources.images").joinpath(
-                            "concrete.jpg"
-                        )
-                    )
-                )
+                tile_sprite = arcade.Sprite()
+                tile_sprite.texture = base_texture
+                tile_sprite.width = tile_width
+                tile_sprite.height = tile_height
                 tile_sprite.center_x = x
                 tile_sprite.center_y = y
                 self.background_sprites.append(tile_sprite)
