@@ -117,7 +117,6 @@ class Maze:
 
             if (x, y) == (end_x, end_y):
                 found = Path(current)
-                print(found)  # noqa: T201
                 result.append(found)
             else:
                 for nx, ny in ((x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)):

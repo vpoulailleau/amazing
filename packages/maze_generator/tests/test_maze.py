@@ -91,3 +91,20 @@ def test_paths_count_simple_maze() -> None:
 
     all_paths = maze.paths(0, 0, 1, 1)
     assert len(all_paths) == 8
+
+
+def test_paths_count_simple_maze_with_walls() -> None:
+    """Count paths on a 3x3 maze with some walls."""
+    maze = Maze(width=3, height=3)
+    for y in range(maze.height):
+        maze.walls[y][1].left = False
+        maze.walls[y][2].left = False
+    for x in range(maze.width):
+        maze.walls[1][x].top = False
+        maze.walls[2][x].top = False
+    maze.walls[1][1].top = True
+    maze.walls[1][2].top = True
+    maze.walls[1][1].left = True
+    maze.walls[2][1].left = True
+    all_paths = maze.paths(0, 0, 2, 2)
+    assert len(all_paths) == 2
