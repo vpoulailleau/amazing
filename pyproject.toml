@@ -7,11 +7,12 @@ authors = [{ name = "Vincent Poulailleau", email = "vpoulailleau@gmail.com" }]
 dependencies = ["arcade"]
 
 [project.scripts]
-maze-generator = "amazing.generator:main"
+maze-generator = "amazing.game.generator:main"
+
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
@@ -54,7 +55,7 @@ python = "./.venv"
 
 [tool.uv]
 dev-dependencies = ["pytest", "pytest-cov", "ruff", "ty"]
-package = false
+package = true
 
 [tool.pytest.ini_options]
 addopts = "-vvv --cov=amazing --cov-report term-missing --cov-report html --cov-branch --cov-config=pyproject.toml --full-trace"

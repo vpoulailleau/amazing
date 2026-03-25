@@ -136,7 +136,7 @@ ruff format src/ tests/
   uv run ruff format --check src/ tests/
   ```
 
-- [ ] **Test coverage is adequate** (target: >80%)
+- [ ] **Test coverage is adequate** (target: >95%)
   ```bash
   uv run python -m pytest --cov=src tests/
   ```
@@ -183,6 +183,7 @@ ruff format src/ tests/
 - [ ] No dead code
 - [ ] No raw dicts, prefer classes for structured data (or dataclass for simple data containers)
 - [ ] Avoid relative imports, start at the root of the project (not the workspace root, but the package root)
+- [ ] Never modify PYTHONPATH or use `sys.path.append()` to import modules or equivalent hacks. Always use absolute imports starting from the package root.
 
 ---
 
