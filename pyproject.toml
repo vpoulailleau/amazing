@@ -4,11 +4,14 @@ version = "0.1.0"
 requires-python = ">=3.14"
 readme = "README.md"
 authors = [{ name = "Vincent Poulailleau", email = "vpoulailleau@gmail.com" }]
-dependencies = ["arcade"]
+dependencies = ["arcade", "psutil"]
+
+[tool.uv]
+dev-dependencies = ["pytest", "pytest-cov", "ruff", "ty"]
+package = true
 
 [project.scripts]
 maze-generator = "amazing.game.generator:main"
-
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
@@ -53,10 +56,6 @@ indent-style = "space"
 [tool.ty.environment]
 python = "./.venv"
 
-[tool.uv]
-dev-dependencies = ["pytest", "pytest-cov", "ruff", "ty"]
-package = true
-
 [tool.pytest.ini_options]
-addopts = "-vvv --cov=amazing --cov-report term-missing --cov-report html --cov-branch --cov-config=pyproject.toml --full-trace"
+addopts = "-vvv --cov=amazing --cov-report term-missing --cov-report html --cov-branch --cov-config=pyproject.toml --full-trace --cov-fail-under=95"
 minversion = "8.0"

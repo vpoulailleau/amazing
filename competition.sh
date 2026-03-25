@@ -1,0 +1,18 @@
+PORT=$(python -c "import random; print(random.randint(50000, 60000))")
+echo "La compétition se passe sur 127.0.0.1:$PORT"
+
+uv run python  -m amazing.killall
+find . -name "*.log" -exec rm \{} \;
+
+uv run python -m amazing.game.server -p $PORT &
+uv run python -m amazing.viewer -p $PORT &
+# https://www.speedscope.app/
+# py-spy record -o profile.data --format speedscope -- python -m amazing.viewer -p $PORT &
+#uv run python -m amazing.viewer -p $PORT --small-window &
+sleep 2
+
+uv run python /home/vincent/Documents/programmation/amazing_player/sample_player_client.py -p $PORT -u "Flash" --winner &
+sleep 1
+
+sleep 330
+uv run python -m amazing.killall
