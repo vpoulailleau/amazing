@@ -39,13 +39,13 @@ class Maze:
         self.height = height
 
         # Initialize walls grid with extra row/column for perimeter
-        # walls[row][col] contains wall info for the cell at (row, col)
+        # wall[x][y] contains wall info for the cell at (x, y)
         self.walls = []
-        for row in range(height + 1):  # +1 for hidden row
+        for x in range(width + 1):  # +1 for hidden column
             self.walls.append([])
-            for _ in range(width + 1):  # +1 for hidden column
+            for _ in range(height + 1):  # +1 for hidden row
                 # Each cell has top and left walls
-                self.walls[row].append(Cell(top=True, left=True))
+                self.walls[x].append(Cell(top=True, left=True))
 
     def __str__(self) -> str:
         """Return an ASCII-art rendering of the maze."""
@@ -54,16 +54,16 @@ class Maze:
         def top_line_for(row: int) -> str:
             line = "+"
             for x in range(self.width):
-                line += "-" if self.walls[row][x].top else " "
+                line += "-" if self.walls[x][row].top else " "
                 line += "+"
             return line
 
         def middle_line_for(row: int) -> str:
             line = ""
             for x in range(self.width):
-                line += "|" if self.walls[row][x].left else " "
+                line += "|" if self.walls[x][row].left else " "
                 line += " "
-            line += "|" if self.walls[row][self.width].left else " "
+            line += "|" if self.walls[self.width][row].left else " "
             return line
 
         for y in range(self.height):
@@ -115,13 +115,13 @@ class Maze:
             return False
 
         if nx == x - 1 and ny == y:
-            return not self.walls[y][x].left
+            return not self.walls[x][y].left
         if nx == x + 1 and ny == y:
-            return not self.walls[y][x + 1].left
+            return not self.walls[x + 1][y].left
         if nx == x and ny == y - 1:
-            return not self.walls[y][x].top
+            return not self.walls[x][y].top
         if nx == x and ny == y + 1:
-            return not self.walls[y + 1][x].top
+            return not self.walls[x][y + 1].top
 
         return False
 
