@@ -1,6 +1,6 @@
-"""Tests for maze_generator.cell module."""
+"""Tests for amazing.game.cell module."""
 
-from maze_generator.cell import Cell
+from amazing.game.cell import Cell
 
 
 def test_cell_initialization_sets_top_and_left_walls() -> None:

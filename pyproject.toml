@@ -1,11 +1,17 @@
 [project]
-name = "amazing-workspace"
+name = "amazing"
 version = "0.1.0"
 requires-python = ">=3.14"
-dependencies = ["maze-generator"]
+readme = "README.md"
+authors = [{ name = "Vincent Poulailleau", email = "vpoulailleau@gmail.com" }]
+dependencies = ["arcade"]
 
-[tool.uv.sources]
-maze-generator = { workspace = true }
+[project.scripts]
+maze-generator = "amazing.generator:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.coverage.report]
 exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
@@ -54,5 +60,5 @@ package = false
 members = ["packages/*"]
 
 [tool.pytest.ini_options]
-addopts = "--import-mode=importlib -vvv --cov-report term-missing --cov-report html --cov-branch --cov-config=pyproject.toml --full-trace"
+addopts = "-vvv --cov=amazing --cov-report term-missing --cov-report html --cov-branch --cov-config=pyproject.toml --full-trace"
 minversion = "8.0"

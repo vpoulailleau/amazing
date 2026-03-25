@@ -1,6 +1,6 @@
 """Tests for maze generation."""
 
-from maze_generator import generate_maze
+from amazing.game.generator import generate_maze
 
 
 def test_generate_maze_basic() -> None:

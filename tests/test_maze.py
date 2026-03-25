@@ -1,7 +1,7 @@
 """Tests for maze_generator.maze module."""
 
-from maze_generator.cell import Cell
-from maze_generator.maze import CellCoord, Maze, Path
+from amazing.game.cell import Cell
+from amazing.game.maze import CellCoord, Maze, Path
 
 
 def test_maze_initialization_sets_width_and_height() -> None:
