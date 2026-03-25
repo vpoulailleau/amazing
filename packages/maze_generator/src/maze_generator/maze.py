@@ -47,29 +47,33 @@ class Maze:
                 # Each cell has top and left walls
                 self.walls[x].append(Cell(top=True, left=True))
 
+    def _top_line_for(self, row: int) -> str:
+        line = "+"
+        for x in range(self.width):
+            line += "-" if self.walls[x][row].top else " "
+            line += "+"
+        return line
+
+    def _middle_line_for(self, row: int, path: Path) -> str:
+        line = ""
+        for x in range(self.width):
+            line += "|" if self.walls[x][row].left else " "
+            line += "#" if (x, row) in path else " "
+        line += "|" if self.walls[self.width][row].left else " "
+        return line
+
     def __str__(self) -> str:
         """Return an ASCII-art rendering of the maze."""
+        return self.highlighted_path(Path())
+
+    def highlighted_path(self, path: Path) -> str:
+        """Return an ASCII-art rendering of the maze with a path highlighted."""
         lines: list[str] = []
 
-        def top_line_for(row: int) -> str:
-            line = "+"
-            for x in range(self.width):
-                line += "-" if self.walls[x][row].top else " "
-                line += "+"
-            return line
-
-        def middle_line_for(row: int) -> str:
-            line = ""
-            for x in range(self.width):
-                line += "|" if self.walls[x][row].left else " "
-                line += " "
-            line += "|" if self.walls[self.width][row].left else " "
-            return line
-
         for y in range(self.height):
-            lines.extend((top_line_for(y), middle_line_for(y)))
+            lines.extend((self._top_line_for(y), self._middle_line_for(y, path)))
 
-        lines.append(top_line_for(self.height))
+        lines.append(self._top_line_for(self.height))
         return "\n".join(lines)
 
     def paths(

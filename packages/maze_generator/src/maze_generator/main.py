@@ -11,6 +11,7 @@ def main() -> None:
     print(f"Number of paths from (0, 0) to (29, 29): {len(paths)}")  # noqa: T201
     if paths:
         print("Example path:", paths[0])  # noqa: T201
+        print(maze.highlighted_path(paths[0]))  # noqa: T201
 
 
 if __name__ == "__main__":
