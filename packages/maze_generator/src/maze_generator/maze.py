@@ -1,5 +1,7 @@
 """Maze data structure for maze generator."""
 
+from .cell import Cell
+
 
 class Maze:
     """Represents a maze with walls between cells.
@@ -25,7 +27,4 @@ class Maze:
             self.walls.append([])
             for _ in range(width + 1):  # +1 for hidden column
                 # Each cell has top and left walls
-                self.walls[row].append({
-                    "top": True,  # wall above this cell
-                    "left": True,  # wall to the left of this cell
-                })
+                self.walls[row].append(Cell(top=True, left=True))

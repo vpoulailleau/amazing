@@ -177,8 +177,10 @@ ruff format src/ tests/
 ### Maintainability
 - [ ] Clear variable/function names
 - [ ] Docstrings explain "why"
-- [ ] Comments explain complex logic only
+- [ ] Comments explain complex logic only that can't be easily refactored to improve clarity
 - [ ] No dead code
+- [ ] No raw dicts, prefer classes for structured data (or dataclass for simple data containers)
+- [ ] Avoid relative imports, start at the root of the project (not the workspace root, but the package root)
 
 ---
 

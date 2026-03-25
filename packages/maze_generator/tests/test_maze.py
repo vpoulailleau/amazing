@@ -1,5 +1,6 @@
 """Tests for maze_generator.maze module."""
 
+from maze_generator.cell import Cell
 from maze_generator.maze import Maze
 
 
@@ -30,9 +31,10 @@ class TestMaze:
         maze = Maze(width=1, height=1)
         # Each position should have both top and left wall data
         # This is a placeholder test - implementation will define the structure
-        cell_walls = maze.walls[0][0]
-        assert "top" in cell_walls
-        assert "left" in cell_walls
+        cell = maze.walls[0][0]
+        assert isinstance(cell, Cell)
+        assert hasattr(cell, "top")
+        assert hasattr(cell, "left")
 
     def test_maze_perimeter_walls_are_present(self):
         """All perimeter walls should be present (outer boundary)."""
@@ -40,13 +42,13 @@ class TestMaze:
         # Check that all outer walls are present
         # Top row should all have top walls
         for col in range(maze.width + 1):
-            assert maze.walls[0][col]["top"] is True
+            assert maze.walls[0][col].top is True
 
         # Left column should all have left walls
         for row in range(maze.height + 1):
-            assert maze.walls[row][0]["left"] is True
+            assert maze.walls[row][0].left is True
 
         # Right column should have left walls (but this is the right edge)
         # Bottom row should have top walls
         for col in range(maze.width + 1):
-            assert maze.walls[maze.height][col]["top"] is True
+            assert maze.walls[maze.height][col].top is True

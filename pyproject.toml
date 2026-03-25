@@ -26,7 +26,7 @@ fixable = ["ALL"]
 unfixable = []
 
 [tool.ruff.lint.extend-per-file-ignores]
-"tests/**/*.py" = [
+"**/tests/**/*.py" = [
     "S101",    # asserts allowed in tests...
     "ARG",     # Unused function args -> fixtures nevertheless are functionally relevant...
     "FBT",     # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
@@ -41,6 +41,9 @@ convention = "google"
 preview = true
 quote-style = "double"
 indent-style = "space"
+
+[tool.ty.environment]
+python = "./.venv"
 
 [tool.uv]
 dev-dependencies = ["pytest", "pytest-cov", "ruff", "ty"]
