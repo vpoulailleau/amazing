@@ -4,14 +4,48 @@ version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = []
 
+[tool.coverage.report]
+exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
+
+[tool.coverage.run]
+omit = []
+
+[tool.ruff]
+target-version = "py314"
+output-format = "pylint"
+fix = true
+
+[tool.ruff.lint]
+preview = true
+select = ["ALL"]
+ignore = ["COM812"]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**/*.py" = [
+    "S101",    # asserts allowed in tests...
+    "ARG",     # Unused function args -> fixtures nevertheless are functionally relevant...
+    "FBT",     # Don't care about booleans as positional arguments in tests, e.g. via @pytest.mark.parametrize()
+    "PLR2004", # Magic value used in comparison, ...
+    "INP001",  #  Add an `__init__.py`
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.format]
+preview = true
+quote-style = "double"
+indent-style = "space"
+
 [tool.uv]
+dev-dependencies = ["pytest", "ruff", "prek", "ty"]
 package = false
 
 [tool.uv.workspace]
 members = ["packages/*"]
 
-[dependency-groups]
-dev = ["pytest", "ruff"]
-
 [tool.pytest.ini_options]
-addopts = "--import-mode=importlib"
+addopts = "--import-mode=importlib -vvv --cov-report term-missing --cov-report html --cov-branch --cov-config=pyproject.toml"
+minversion = "8.0"

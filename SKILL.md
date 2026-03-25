@@ -202,11 +202,11 @@ ruff format src/ tests/
 Add to `pyproject.toml`:
 ```toml
 [tool.ruff]
-target-version = "py39"
+target-version = "py314"
 line-length = 88
 
 [tool.ty]
-python_version = "3.9"
+python_version = "3.14"
 warn_return_any = true
 warn_unused_configs = true
 ```
