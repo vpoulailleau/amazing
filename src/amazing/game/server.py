@@ -1,3 +1,5 @@
+"""Network game server that coordinates players and spectators."""
+
 import argparse
 import contextlib
 import json
@@ -15,10 +17,15 @@ from amazing.network.data_handler import NetworkError
 from amazing.network.server import ClientData, Server
 
 server_connection_timeout = 10
+FRAME_WINDOW_SECONDS = 0.033
+logger = logging.getLogger(__name__)
 
 
 class GameServer(Server):
+    """Host a maze game and synchronize connected clients."""
+
     def __init__(self: GameServer, host: str, port: int) -> None:
+        """Start the server, wait for players, then initialize the game."""
         super().__init__(host, port)
         self.game = Game()
         self._wait_connections()
@@ -27,13 +34,16 @@ class GameServer(Server):
 
     @property
     def players(self) -> list[ClientData]:
+        """Return non-spectator clients."""
         return [client for client in list(self.clients) if not client.spectator]
 
     @property
     def spectators(self) -> list[ClientData]:
+        """Return spectator clients."""
         return [client for client in list(self.clients) if client.spectator]
 
     def remove_client(self: GameServer, client: ClientData) -> None:
+        """Remove a client and mark its player as blocked when relevant."""
         self.clients.remove(client)
         if not client.spectator:
             for player in self.game.players:
@@ -41,66 +51,76 @@ class GameServer(Server):
                     player.blocked_counter = MAX_BLOCKED_COUNTER + 1
 
     def _wait_connections(self: GameServer) -> None:
+        """Wait for at least one player and then a short join window."""
         while not self.players:
-            print("Waiting for player clients")
+            logger.info("Waiting for player clients")
             sleep(1)
 
         for second in range(1, server_connection_timeout + 1):
             names = [player.name for player in self.players]
-            print(
-                f"Waiting other players ({second}/{server_connection_timeout}) {names}",
+            logger.info(
+                "Waiting other players (%s/%s) %s",
+                second,
+                server_connection_timeout,
+                names,
             )
             if len(self.players) == MAX_NB_PLAYERS:
                 break
             sleep(1)
 
-        print("Players ready: START!!!")
+        logger.info("Players ready: START!!!")
         self.game.start()
         for player in self.players:
             self.write(player, "START")
 
     def read(self, client: ClientData) -> str:
+        """Read one command line from a client.
+
+        Returns:
+            The text command received from the client, or an empty string on timeout.
+        """
         try:
             text = client.network.readline()
         except NetworkError:
-            logging.exception("timeout for client %s", client.name)
+            logger.exception("timeout for client %s", client.name)
             self.remove_client(client)
             return ""
 
-        logging.debug(text)
+        logger.debug(text)
         return text
 
     def write(self, client: ClientData, text: str) -> None:
+        """Send one line of text to a client."""
         if not text.endswith("\n"):
             text += "\n"
-        logging.debug("sending to %s", client.name)
+        logger.debug("sending to %s", client.name)
         try:
             client.network.write(text)
         except NetworkError, TimeoutError:
-            logging.exception("Problem sending state to client")
+            logger.exception("Problem sending state to client")
             self.remove_client(client)
 
     def run(self: GameServer) -> None:
+        """Run the game loop until the game ends or time expires."""
         while True:
             start = perf_counter()
-            # refresh spectators every 33 ms
-            while perf_counter() - start < 0.033:
+            while perf_counter() - start < FRAME_WINDOW_SECONDS:
                 # TODO one command per player at a time, until exhausted or 0.0033s
                 for player_id, player in enumerate(self.players):
                     if player.network.input_empty():
                         continue
                     command = self.read(player)
-                    logging.info("Command [%s] %s", player.name, command)
+                    logger.info("Command [%s] %s", player.name, command)
                     self.write(player, self.game.manage_command(player_id, command))
             self.game.update()
             for spectator in self.spectators:
                 self.write(spectator, json.dumps(self.game.state()))
 
             if self.game.cumulated_time > MAX_GAME_DURATION_SECONDS:
-                logging.info("Reached time limit for the game")
+                logger.info("Reached time limit for the game")
                 break
             if self.game.finished:
-                logging.info("A player won the game")
+                logger.info("A player won the game")
                 break
         sys.exit(0)
 
@@ -148,5 +168,5 @@ if __name__ == "__main__":
             ),
             datefmt="%m/%d/%Y %H:%M:%S",
         )
-        logging.info("Launching server")
+        logger.info("Launching server")
         GameServer(args.address, args.port).run()

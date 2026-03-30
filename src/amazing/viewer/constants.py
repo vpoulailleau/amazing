@@ -5,17 +5,18 @@ import math
 from typing import ClassVar
 
 
+def _team_color(hue: int) -> tuple[int, int, int]:
+    red, green, blue = colorsys.hsv_to_rgb(((hue * math.pi / 2) % 360) / 360, 1, 1)
+    return int(red * 255), int(green * 255), int(blue * 255)
+
+
 class Constants:
     """Container for viewer layout and color constants."""
 
     SCREEN_TITLE = "Amazing Viewer"
     TEAM_HUES: ClassVar[dict[int, int]] = {0: 0, 1: 30, 2: 65, 3: 120}
     TEAM_COLORS: ClassVar[dict[int, tuple[int, int, int]]] = {
-        team: tuple(
-            int(c * 255)
-            for c in colorsys.hsv_to_rgb(((hue * math.pi / 2) % 360) / 360, 1, 1)
-        )
-        for team, hue in TEAM_HUES.items()
+        team: _team_color(hue) for team, hue in TEAM_HUES.items()
     }
 
     def resize(self, *, small_window: bool) -> None:
