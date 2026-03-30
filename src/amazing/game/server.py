@@ -111,7 +111,7 @@ class GameServer(Server):
                     if player.network.input_empty():
                         continue
                     command = self.read(player)
-                    logger.info("Command [%s] %s", player.name, command)
+                    logger.debug("Command [%s] %s", player.name, command)
                     try:
                         self.write(player, self.game.manage_command(player_id, command))
                     except BlockedPlayerError as e:
