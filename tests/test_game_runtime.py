@@ -31,8 +31,15 @@ class StubPlayer:
         self.updated_with.append(delta_time)
 
     @staticmethod
-    def state() -> dict[str, str | bool | int]:
-        return {"name": "stub", "blocked": False, "score": 7}
+    def state() -> dict[str, str | bool | int | float | tuple[float, float]]:
+        return {
+            "name": "stub",
+            "blocked": False,
+            "score": 7,
+            "speed": 0.0,
+            "orientation": 0,
+            "position": (0.5, 0.5),
+        }
 
 
 def test_game_constants_are_stable() -> None:
@@ -97,7 +104,16 @@ def test_game_update_manage_command_and_state(monkeypatch: pytest.MonkeyPatch) -
     assert game.last_update_time == pytest.approx(1.25)
     assert game.state() == {
         "time": pytest.approx(0.25),
-        "players": [{"name": "stub", "blocked": False, "score": 7}],
+        "players": [
+            {
+                "name": "stub",
+                "blocked": False,
+                "score": 7,
+                "speed": 0.0,
+                "orientation": 0,
+                "position": (0.5, 0.5),
+            }
+        ],
     }
 
 
@@ -145,8 +161,40 @@ def test_player_invalid_commands_increment_block_counter() -> None:
 def test_player_blocked_update_and_state() -> None:
     """Blocked state and serialization should reflect the player counters."""
     player = Player("alice", Game())
+    player.accelerate()
+    player.turn_right()
     player.blocked_counter = MAX_BLOCKED_COUNTER + 1
 
     assert player.manage_command("MOVE north") == "BLOCKED"
     player.update(0.5)
-    assert player.state() == {"name": "alice", "blocked": True, "score": 0}
+    assert player.state() == {
+        "name": "alice",
+        "blocked": True,
+        "score": 0,
+        "speed": pytest.approx(0.1),
+        "orientation": -10,
+        "position": (0.5, 0.5),
+    }
+
+
+def test_player_motion_methods_and_update() -> None:
+    """Player motion attributes should update from speed and orientation."""
+    player = Player("alice", Game())
+
+    assert player.state()["speed"] == pytest.approx(0.0)
+    assert player.state()["orientation"] == 0
+    assert player.state()["position"] == (0.5, 0.5)
+
+    player.accelerate()
+    player.accelerate()
+    player.decelerate()
+    player.turn_right()
+    player.turn_left()
+    player.update(2.0)
+
+    state = player.state()
+    assert state["speed"] == pytest.approx(0.1)
+    assert state["orientation"] == -20
+    x_pos, y_pos = state["position"]
+    assert x_pos == pytest.approx(0.6879385241571817)
+    assert y_pos == pytest.approx(0.43159597133486625)

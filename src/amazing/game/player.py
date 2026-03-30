@@ -1,6 +1,7 @@
 """Player state and command handling."""
 
 import logging
+import math
 from typing import TYPE_CHECKING, NoReturn
 
 from amazing.game.constants import MAX_BLOCKED_COUNTER
@@ -10,7 +11,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
-type PlayerState = dict[str, str | bool | int]
+type PlayerState = dict[str, str | bool | int | float | tuple[float, float]]
 
 
 def _raise_unknown_command(command_str: str) -> NoReturn:
@@ -27,6 +28,9 @@ class Player:
         self.blocked_counter = 0
         self.game = game
         self.score = 0
+        self._speed = 0.0
+        self._orientation = 0
+        self._position = (0.5, 0.5)
 
     @property
     def blocked(self) -> bool:
@@ -56,9 +60,29 @@ class Player:
 
     def update(self, delta_time: float) -> None:
         """Update runtime player state for one frame."""
-        _ = delta_time
         if self.blocked:
             return
+
+        orientation_radians = math.radians(self._orientation)
+        delta_x = math.cos(orientation_radians) * self._speed * delta_time
+        delta_y = math.sin(orientation_radians) * self._speed * delta_time
+        self._position = (self._position[0] + delta_x, self._position[1] + delta_y)
+
+    def accelerate(self) -> None:
+        """Increase player speed by 0.1 cell/s."""
+        self._speed += 0.1
+
+    def decelerate(self) -> None:
+        """Decrease player speed by 0.1 cell/s."""
+        self._speed -= 0.1
+
+    def turn_right(self) -> None:
+        """Rotate orientation by -10 degrees."""
+        self._orientation -= 10
+
+    def turn_left(self) -> None:
+        """Rotate orientation by -10 degrees."""
+        self._orientation -= 10
 
     def state(self) -> PlayerState:
         """Return a serializable view of the player state.
@@ -70,4 +94,7 @@ class Player:
             "name": self.name,
             "blocked": self.blocked,
             "score": self.score,
+            "speed": self._speed,
+            "orientation": self._orientation,
+            "position": self._position,
         }
