@@ -71,7 +71,13 @@ class Player:
             raise BlockedPlayerError(self.name)
         command = command_str.split()
         try:
-            if command[0] in {"ACCELERATE", "DECELERATE", "TURN_RIGHT", "TURN_LEFT"}:
+            if command[0] in {
+                "ACCELERATE",
+                "DECELERATE",
+                "TURN_RIGHT",
+                "TURN_LEFT",
+                "GET_SENSORS",
+            }:
                 return getattr(self, command[0].lower())()
             _raise_unknown_command(command_str)
         except ValueError as e:
@@ -127,6 +133,18 @@ class Player:
         """
         self._orientation += 10
         return "OK"
+
+    def get_sensors(self) -> str:
+        """Return a sensor reading.
+
+        Returns:
+            A string".
+        """
+        return (
+            f"{self.game.cumulated_time:.2f} "
+            f"{self._position[0]:.2f} {self._position[1]:.2f} "
+            f"{self._orientation} {self._speed:.2f}"
+        )
 
     def state(self) -> PlayerState:
         """Return a serializable view of the player state.
