@@ -79,4 +79,11 @@ class Maze:
 
     def draw(self) -> None:
         """Draw maze wall sprites."""
+        arcade.draw_lbwh_rectangle_filled(
+            constants.MAP_MIN_X,
+            constants.MAP_MIN_Y,
+            constants.MAP_WIDTH,
+            constants.MAP_HEIGHT,
+            (255, 255, 255, 120),
+        )
         self.wall_sprites.draw()
