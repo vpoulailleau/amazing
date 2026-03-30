@@ -51,7 +51,7 @@ class Player:
         self.score = 0
         self._speed = 0.0
         self._orientation = 0
-        self._position = (0.5, 0.5)
+        self.position = (0.5, 0.5)
 
     @property
     def blocked(self) -> bool:
@@ -95,7 +95,7 @@ class Player:
         orientation_radians = math.radians(-self._orientation)
         delta_x = math.cos(orientation_radians) * self._speed * delta_time
         delta_y = math.sin(orientation_radians) * self._speed * delta_time
-        self._position = (self._position[0] + delta_x, self._position[1] + delta_y)
+        self.position = (self.position[0] + delta_x, self.position[1] + delta_y)
 
     def accelerate(self) -> str:
         """Increase player speed by 0.1 cell/s.
@@ -142,7 +142,7 @@ class Player:
         """
         return (
             f"{self.game.cumulated_time:.2f} "
-            f"{self._position[0]:.2f} {self._position[1]:.2f} "
+            f"{self.position[0]:.2f} {self.position[1]:.2f} "
             f"{self._orientation} {self._speed:.2f}"
         )
 
@@ -158,5 +158,5 @@ class Player:
             "score": self.score,
             "speed": self._speed,
             "orientation": self._orientation,
-            "position": self._position,
+            "position": self.position,
         }

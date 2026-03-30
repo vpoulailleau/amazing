@@ -3,7 +3,8 @@
 import logging
 from time import perf_counter
 
-from amazing.game.constants import MAX_NB_PLAYERS
+from amazing.game import Maze, generate_maze
+from amazing.game.constants import MAX_NB_PLAYERS, MAZE_DIMENSION
 from amazing.game.player import Player, PlayerState
 
 logger = logging.getLogger(__name__)
@@ -18,14 +19,20 @@ class Game:
         self.last_update_time = self.start_time
         self.cumulated_time = 0.0
         self.players: list[Player] = []
+        self.maze: Maze = None  # ty: ignore[invalid-assignment]
 
     @property
     def finished(self) -> bool:
         """Return whether the game has a winner."""
-        return False
+        return any(
+            int(player.position[0]) == MAZE_DIMENSION - 1
+            and int(player.position[1]) == MAZE_DIMENSION - 1
+            for player in self.players
+        )
 
     def start(self) -> None:
         """Reset timers when a game starts."""
+        self.maze = generate_maze(MAZE_DIMENSION, MAZE_DIMENSION)
         self.start_time = perf_counter()
         self.last_update_time = self.start_time
 
