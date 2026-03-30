@@ -158,15 +158,28 @@ if __name__ == "__main__":
         with contextlib.redirect_stdout(None), contextlib.redirect_stderr(None):
             GameServer(args.address, args.port).run()
     else:
-        logging.basicConfig(
-            filename="server.log",
-            encoding="utf-8",
-            level=logging.INFO,
-            format=(
-                "%(asctime)s [%(levelname)-8s] %(filename)20s(%(lineno)3s):"
-                "%(funcName)-20s :: %(message)s"
-            ),
+        log_format = (
+            "%(asctime)s [%(levelname)-8s] %(filename)20s(%(lineno)3s):"
+            "%(funcName)-20s :: %(message)s"
+        )
+        formatter = logging.Formatter(
+            log_format,
             datefmt="%m/%d/%Y %H:%M:%S",
         )
+
+        root_logger = logging.getLogger()
+        root_logger.setLevel(logging.INFO)
+
+        file_handler = logging.FileHandler(
+            "server.log",
+            encoding="utf-8",
+        )
+        file_handler.setFormatter(formatter)
+        root_logger.addHandler(file_handler)
+
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        root_logger.addHandler(console_handler)
+
         logger.info("Launching server")
         GameServer(args.address, args.port).run()

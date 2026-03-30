@@ -189,7 +189,7 @@ def test_player_motion_methods_and_update() -> None:
     player.accelerate()
     player.decelerate()
     player.turn_right()
-    player.turn_left()
+    player.turn_right()
     player.update(2.0)
 
     state = player.state()
