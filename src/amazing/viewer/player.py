@@ -7,7 +7,7 @@ import arcade
 
 from amazing.viewer.constants import constants
 
-POSITION_TRACE_DURATION = 10.0  # seconds of history to display
+POSITION_TRACE_DURATION = 3.0  # seconds of history to display
 DOT_RADIUS = 3  # pixels
 DOT_COLOR = (200, 200, 200, 200)  # light gray with transparency
 
@@ -24,6 +24,7 @@ class Player:
         self.sprite = arcade.Sprite()
         self.sprite.texture = texture
         self.position_history: list[tuple[float, float, float]] = []  # (time, x, y)
+        self.shape_list = arcade.shape_list.ShapeElementList()
 
     def update_from_state(
         self,
@@ -57,7 +58,18 @@ class Player:
             (t, x, y) for t, x, y in self.position_history if t >= cutoff_time
         ]
 
-    def draw_trace(self) -> None:
-        """Draw dots for the position history."""
+        # Rebuild shape list with circles
+        self.shape_list.clear()
         for _time, x, y in self.position_history:
-            arcade.draw_circle_filled(int(x), int(y), DOT_RADIUS, DOT_COLOR)
+            circle = arcade.shape_list.create_ellipse_filled(
+                int(x),
+                int(y),
+                DOT_RADIUS,
+                DOT_RADIUS,
+                DOT_COLOR,
+            )
+            self.shape_list.append(circle)
+
+    def draw_trace(self) -> None:
+        """Draw the shape list containing trace circles."""
+        self.shape_list.draw()
