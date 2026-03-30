@@ -4,7 +4,7 @@ echo "La compétition se passe sur 127.0.0.1:$PORT"
 uv run python  -m amazing.killall
 find . -name "*.log" -exec rm \{} \;
 
-uv run python -m amazing.game.server -p $PORT &
+uv run python -m amazing.game.server -p $PORT --timeout 5 &
 uv run python -m amazing.viewer -p $PORT &
 # https://www.speedscope.app/
 # py-spy record -o profile.data --format speedscope -- python -m amazing.viewer -p $PORT &
