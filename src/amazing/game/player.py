@@ -11,6 +11,8 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+# TODO manage a rotation speed
+
 
 class PlayerState(TypedDict):
     """Serializable player state payload."""
@@ -90,8 +92,8 @@ class Player:
         self._orientation -= 10
 
     def turn_left(self) -> None:
-        """Rotate orientation by -10 degrees."""
-        self._orientation -= 10
+        """Rotate orientation by 10 degrees."""
+        self._orientation += 10
 
     def state(self) -> PlayerState:
         """Return a serializable view of the player state.
