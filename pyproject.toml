@@ -22,6 +22,7 @@ exclude_lines = ["pragma: no cover", "if TYPE_CHECKING:"]
 
 [tool.coverage.run]
 omit = [
+    "src/amazing/game/server.py",
     "src/amazing/network/*",
     "src/amazing/killall.py",
     "src/amazing/viewer/*",
@@ -47,6 +48,7 @@ unfixable = []
     "PLR2004", # Magic value used in comparison, ...
     "INP001",  #  Add an `__init__.py`
     "T201",    # Print statements allowed in tests for debugging purposes, and often left in place for future debugging needs
+    "D",       # Docstrings are often not relevant in tests, and can be a burden to maintain, especially for simple test functions.
 ]
 
 [tool.ruff.lint.pydocstyle]
