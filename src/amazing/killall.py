@@ -1,11 +1,8 @@
 """Kill running Amazing-related Python processes."""
 
-import logging
 from contextlib import suppress
 
 import psutil
-
-logger = logging.getLogger(__name__)
 
 teams = ["player.player"]
 
@@ -14,10 +11,11 @@ for process in psutil.process_iter():
         line = " ".join(process.cmdline()).lower()
         if "python" not in line and "uv run" not in line:
             continue
+        print("testing", line)  # noqa: T201
         if (
             "amazing." in line
             or ("sample_" in line and "_player" in line)
             or any(team in line for team in teams)
         ) and ("amazing.killall" not in line):
-            logger.info("killing process: %s", line)
+            print("    killing process:", line)  # noqa: T201
             process.kill()
