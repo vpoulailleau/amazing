@@ -9,7 +9,7 @@ import pytest
 import amazing.game.game as game_module
 from amazing.game.constants import (
     MAX_BLOCKED_COUNTER,
-    MAX_GAME_DURATION_SECONDS,
+    MAX_EXPLORATION_DURATION_SECONDS,
     MAX_NB_PLAYERS,
 )
 from amazing.game.game import Game
@@ -45,7 +45,7 @@ class StubPlayer:
 
 def test_game_constants_are_stable() -> None:
     """Game constants should keep their published values."""
-    assert MAX_GAME_DURATION_SECONDS == 300
+    assert MAX_EXPLORATION_DURATION_SECONDS == 300
     assert MAX_NB_PLAYERS == 20
     assert MAX_BLOCKED_COUNTER == 3
 

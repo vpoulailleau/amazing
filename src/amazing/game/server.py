@@ -9,8 +9,9 @@ from time import perf_counter, sleep
 
 from amazing.game.constants import (
     MAX_BLOCKED_COUNTER,
-    MAX_GAME_DURATION_SECONDS,
+    MAX_EXPLORATION_DURATION_SECONDS,
     MAX_NB_PLAYERS,
+    MAX_RACE_DURATION_SECONDS,
 )
 from amazing.game.game import Game
 from amazing.game.player import BlockedPlayerError
@@ -121,10 +122,21 @@ class GameServer(Server):
             for spectator in self.spectators:
                 self.write(spectator, json.dumps(self.game.state()))
 
-            if self.game.cumulated_time > MAX_GAME_DURATION_SECONDS:
-                logger.info("Reached time limit for the game")
+            if (
+                self.game.cumulated_time > MAX_EXPLORATION_DURATION_SECONDS
+                and self.game.exploration_phase
+            ):
+                logger.info("Reached time limit for the exploration")
+                self.game.start_race()
+
+            if (
+                self.game.cumulated_time
+                > MAX_EXPLORATION_DURATION_SECONDS + MAX_RACE_DURATION_SECONDS
+            ):
+                logger.info("Reached time limit for the race")
                 break
-            if self.game.finished:
+
+            if self.game.finished and not self.game.exploration_phase:
                 logger.info("A player won the game")
                 break
         sys.exit(0)

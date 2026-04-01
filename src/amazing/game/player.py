@@ -56,6 +56,14 @@ class Player:
         self._orientation = 0
         self.position = (0.5, 0.5)
 
+    def reset(self) -> None:
+        """Reset player state for the start of a race."""
+        self.blocked_counter = 0
+        self.score = 0
+        self._speed = 0.0
+        self._orientation = 0
+        self.position = (0.5, 0.5)
+
     @property
     def blocked(self) -> bool:
         """Return whether the player is blocked after repeated invalid commands."""
@@ -203,7 +211,7 @@ class Player:
         """Return sensor data for the current player state.
 
         Returns:
-            Space-separated string: time, x, y, orientation, speed,
+            Space-separated string: time, exploration_phase, x, y, orientation, speed,
             front distance, right distance, rear distance, left distance.
         """
         front = self._ray_distance(self._orientation)
@@ -211,7 +219,7 @@ class Player:
         rear = self._ray_distance(self._orientation + 180)
         left = self._ray_distance(self._orientation + 90)
         return (
-            f"{self.game.cumulated_time:.2f} "
+            f"{self.game.cumulated_time:.2f} {int(self.game.exploration_phase)} "
             f"{self.position[0]:.2f} {self.position[1]:.2f} "
             f"{self._orientation} {self._speed:.2f} "
             f"{front:.2f} {right:.2f} {rear:.2f} {left:.2f}"

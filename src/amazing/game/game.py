@@ -34,6 +34,7 @@ class Game:
         self.cumulated_time = 0.0
         self.players: list[Player] = []
         self.maze: Maze = None  # ty: ignore[invalid-assignment]
+        self.exploration_phase = True
 
     @property
     def finished(self) -> bool:
@@ -49,6 +50,12 @@ class Game:
         self.maze = generate_maze(MAZE_DIMENSION, MAZE_DIMENSION)
         self.start_time = perf_counter()
         self.last_update_time = self.start_time
+
+    def start_race(self) -> None:
+        """Transition from exploration to race"""
+        self.exploration_phase = False
+        for player in self.players:
+            player.reset()
 
     def manage_command(self, player_id: int, command: str) -> str:
         """Dispatch a command to the matching player.
