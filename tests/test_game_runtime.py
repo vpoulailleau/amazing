@@ -11,6 +11,7 @@ from amazing.game.constants import (
     MAX_BLOCKED_COUNTER,
     MAX_EXPLORATION_DURATION_SECONDS,
     MAX_NB_PLAYERS,
+    MAX_RACE_DURATION_SECONDS,
 )
 from amazing.game.game import Game
 from amazing.game.maze import Maze
@@ -45,7 +46,8 @@ class StubPlayer:
 
 def test_game_constants_are_stable() -> None:
     """Game constants should keep their published values."""
-    assert MAX_EXPLORATION_DURATION_SECONDS == 300
+    assert MAX_EXPLORATION_DURATION_SECONDS == 30
+    assert MAX_RACE_DURATION_SECONDS == 60
     assert MAX_NB_PLAYERS == 20
     assert MAX_BLOCKED_COUNTER == 3
 
@@ -211,8 +213,8 @@ def test_player_sensors_all_directions_in_1x1_maze() -> None:
     player = Player("alice", game)
 
     parts = player.get_sensors().split()
-    assert parts[:5] == ["0.00", "0.50", "0.50", "0", "0.00"]
-    assert all(float(d) == pytest.approx(0.5) for d in parts[5:])
+    assert parts[:6] == ["0.00", "1", "0.50", "0.50", "0", "0.00"]
+    assert all(float(d) == pytest.approx(0.5) for d in parts[6:])
 
 
 def test_player_sensors_pass_through_open_walls() -> None:
@@ -227,7 +229,7 @@ def test_player_sensors_pass_through_open_walls() -> None:
     player = Player("alice", game)
 
     parts = player.get_sensors().split()
-    front, right, rear, left = (float(x) for x in parts[5:])
+    front, right, rear, left = (float(x) for x in parts[6:])
     assert front == pytest.approx(1.5)  # east: passes open vertical wall
     assert right == pytest.approx(1.5)  # +y: passes open horizontal wall
     assert rear == pytest.approx(0.5)  # west: left perimeter immediately

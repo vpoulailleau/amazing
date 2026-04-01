@@ -52,7 +52,7 @@ class Game:
         self.last_update_time = self.start_time
 
     def start_race(self) -> None:
-        """Transition from exploration to race"""
+        """Transition from exploration to race."""
         self.exploration_phase = False
         for player in self.players:
             player.reset()
