@@ -27,6 +27,7 @@ class BlockedPlayerError(Exception):
 class PlayerState(TypedDict):
     """Serializable player state payload."""
 
+    id: int
     name: str
     blocked: bool
     score: int
@@ -55,6 +56,7 @@ class Player:
         self._speed = 0.0
         self._orientation = 0
         self.position = (0.5, 0.5)
+        self.id = 0
 
     def reset(self) -> None:
         """Reset player state for the start of a race."""
@@ -232,6 +234,7 @@ class Player:
             A dictionary with the public player fields.
         """
         return {
+            "id": self.id,
             "name": self.name,
             "blocked": self.blocked,
             "score": self.score,

@@ -73,6 +73,7 @@ class Game:
         if len(self.players) >= MAX_NB_PLAYERS:
             return
         player = Player(player_name, self)
+        player.id = len(self.players)
         self.players.append(player)
 
     def update(self) -> None:

@@ -6,15 +6,11 @@ from typing import Any
 import arcade
 
 from amazing.viewer.constants import constants
+from amazing.viewer.utils import hue_changed_texture
 
 POSITION_TRACE_DURATION = 10.0  # seconds of history to display
 POSITION_TRACE_PERIOD = 0.1  # seconds between recorded positions
 DOT_COLOR = (200, 200, 200, 200)  # light gray with transparency
-
-
-texture = arcade.load_texture(
-    str(files("amazing.viewer.resources.images").joinpath("car.png"))
-)
 
 
 class Player:
@@ -23,9 +19,15 @@ class Player:
     def __init__(self) -> None:
         """Initialize a player sprite from a texture."""
         self.sprite = arcade.Sprite()
-        self.sprite.texture = texture
+        self.sprite.texture = hue_changed_texture(
+            str(files("amazing.viewer.resources.images").joinpath("car.png")),
+            target_hue=50,
+        )
+        self.sprite.width = 0.8 * constants.CELL_WIDTH
+        self.sprite.height = 0.4 * constants.CELL_HEIGHT
         self.position_history: list[tuple[float, float, float]] = []  # (time, x, y)
         self.shape_list = arcade.shape_list.ShapeElementList()
+        self.id: int | None = None
 
     def update_from_state(
         self,
@@ -38,12 +40,16 @@ class Player:
             state: Player state dict from server.
             current_time: Current server time in seconds.
         """
+        if self.id is None:
+            self.id = int(state["id"])
+            self.sprite.texture = hue_changed_texture(
+                str(files("amazing.viewer.resources.images").joinpath("car.png")),
+                target_hue=self.id * 30 % 360,
+            )
         position = state.get("position", (0.5, 0.5))
         x_pos, y_pos = position
         orientation = state.get("orientation", 0)
 
-        self.sprite.width = 0.8 * constants.CELL_WIDTH
-        self.sprite.height = 0.4 * constants.CELL_HEIGHT
         self.sprite.center_x = constants.MAP_MIN_X + x_pos * constants.CELL_WIDTH
         self.sprite.center_y = constants.MAP_MAX_Y - y_pos * constants.CELL_HEIGHT
         self.sprite.angle = -float(orientation)
