@@ -4,7 +4,7 @@ import logging
 import math
 from typing import TYPE_CHECKING, NoReturn, TypedDict
 
-from amazing.game.constants import MAX_BLOCKED_COUNTER
+from amazing.game.constants import MAX_BLOCKED_COUNTER, MAX_EXPLORATION_DURATION_SECONDS
 
 if TYPE_CHECKING:
     from amazing.game.game import Game
@@ -21,9 +21,6 @@ class BlockedPlayerError(Exception):
         self.name = player_name
 
 
-# TODO manage a rotation speed
-
-
 class PlayerState(TypedDict):
     """Serializable player state payload."""
 
@@ -36,6 +33,7 @@ class PlayerState(TypedDict):
     orientation: int
     position: tuple[float, float]
     finished: bool
+    race_time: float
 
 
 def _raise_unknown_command(command_str: str) -> NoReturn:
@@ -60,6 +58,7 @@ class Player:
         self.id = 0
         self.visited_cells: set[tuple[int, int]] = set()
         self.finished = False
+        self.race_time: float = 0.0
 
     def reset(self) -> None:
         """Reset player state for the start of a race."""
@@ -77,7 +76,12 @@ class Player:
     @property
     def score(self) -> int:
         """Return the player's score based on visited cells."""
-        return self.nb_visited_cells
+        race_score = 0
+        if self.race_time and self.game:
+            race_score = int(
+                20 * max(self.game.maze.width, self.game.maze.height) / self.race_time
+            )
+        return self.nb_visited_cells + race_score
 
     @property
     def nb_visited_cells(self) -> int:
@@ -123,6 +127,10 @@ class Player:
         delta_y = math.sin(orientation_radians) * self._speed * delta_time
         self.position = (self.position[0] + delta_x, self.position[1] + delta_y)
         self.visited_cells.add((int(self.position[0]), int(self.position[1])))
+        if not self.finished:
+            self.race_time = max(
+                0, self.game.cumulated_time - MAX_EXPLORATION_DURATION_SECONDS
+            )
         if (
             self.game.maze is not None
             and int(self.position[0]) == self.game.maze.width - 1
@@ -263,4 +271,5 @@ class Player:
             "orientation": self._orientation,
             "position": self.position,
             "finished": self.finished,
+            "race_time": self.race_time,
         }
