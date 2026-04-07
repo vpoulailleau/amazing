@@ -74,8 +74,10 @@ class Game:
         if len(self.players) >= MAX_NB_PLAYERS:
             return
         player = Player(player_name, self)
-        player.id = len(self.players)
         self.players.append(player)
+        self.players.sort(key=lambda player: player.name)
+        for index, player in enumerate(self.players):
+            player.id = index
 
     def update(self) -> None:
         """Advance timers and update every active player."""
