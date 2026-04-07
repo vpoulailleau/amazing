@@ -13,7 +13,6 @@ def get_texts(
     text: str, x: int, y: int, color: tuple[int, int, int], size: int
 ) -> list[arcade.Text]:
     texts: list[arcade.Text] = []
-    halo_color = (255, 255, 255, 50)
     for offset_x in (-1, 1):
         for offset_y in (-1, 1):
             texts.append(
@@ -21,9 +20,9 @@ def get_texts(
                     text,
                     x + offset_x,
                     y + offset_y,
-                    halo_color,
+                    color,
                     font_size=size,
-                    font_name="Sportrop",
+                    font_name="Fira Code",
                 )
             )
     texts.append(
@@ -33,7 +32,7 @@ def get_texts(
             y,
             color,
             font_size=size,
-            font_name="Sportrop",
+            font_name="Fira Code",
         )
     )
     return texts
@@ -63,7 +62,9 @@ class Score:
         self.shape_list = arcade.shape_list.ShapeElementList()
 
     def setup(self) -> None:
-        font_file = files("amazing.viewer.resources.fonts").joinpath("Sportrop.ttf")
+        font_file = files("amazing.viewer.resources.fonts").joinpath(
+            "FiraCode-Bold.ttf"
+        )
 
         arcade.load_font(str(font_file))
         self.shape_list.clear()
