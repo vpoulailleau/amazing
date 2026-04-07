@@ -8,7 +8,7 @@ from amazing.game.constants import MAX_EXPLORATION_DURATION_SECONDS
 from amazing.viewer.constants import TEAM_HUES, constants, team_color
 
 
-@lru_cache(maxsize=32)
+@lru_cache(maxsize=128)
 def get_texts(
     text: str, x: int, y: int, color: tuple[int, int, int], size: int
 ) -> list[arcade.Text]:
@@ -52,6 +52,7 @@ class TeamData:
     blocked: bool
     score: int
     nb_visited_cells: int
+    race_time: float = 0.0
 
 
 class Score:
@@ -137,6 +138,13 @@ class Score:
                     team_data.color,
                     size=constants.SCORE_FONT_SIZE - 10,
                 )
+                draw_text(
+                    f"Time: {self.time_str(team_data.race_time)}",
+                    constants.SCORE_MARGIN,
+                    team_offset - 3 * team_size // 4,
+                    team_data.color,
+                    size=constants.SCORE_FONT_SIZE - 10,
+                )
 
     def update(self, server_data: dict) -> None:
         if server_data["time"] < MAX_EXPLORATION_DURATION_SECONDS:
@@ -152,5 +160,8 @@ class Score:
                     blocked=player_data["blocked"],
                     score=player_data["score"],
                     nb_visited_cells=player_data["nb_visited_cells"],
+                    race_time=player_data["race_time"]
+                    if player_data["finished"]
+                    else 0.0,
                 )
             )
