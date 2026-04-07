@@ -59,13 +59,25 @@ class Score:
         self.port = port
         self.addr = addr
         self.time = 0.0
+        self.shape_list = arcade.shape_list.ShapeElementList()
 
     def setup(self) -> None:
         font_file = files("amazing.viewer.resources.fonts").joinpath("Sportrop.ttf")
 
         arcade.load_font(str(font_file))
+        self.shape_list.clear()
+        self.shape_list.append(
+            arcade.shape_list.create_rectangle_filled(
+                constants.SCORE_WIDTH // 2,
+                constants.SCORE_HEIGHT // 2,
+                constants.SCORE_WIDTH,
+                constants.SCORE_HEIGHT,
+                (220, 220, 220, 150),
+            )
+        )
 
     def draw(self) -> None:
+        self.shape_list.draw()
         draw_text(
             f"Time: {int(self.time)}",
             constants.SCORE_MARGIN,
