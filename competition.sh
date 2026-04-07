@@ -12,6 +12,8 @@ uv run python -m amazing.viewer -p $PORT &
 sleep 2
 
 uv run python /home/vincent/Documents/programmation/amazing_player/sample_player_client.py -p $PORT -u "Flash" --winner &
+uv run python /home/vincent/Documents/programmation/amazing_player/sample_player_client.py -p $PORT -u "KITT" &
+uv run python /home/vincent/Documents/programmation/amazing_player/sample_player_client.py -p $PORT -u "Optimus Prime" &
 sleep 1
 
 sleep 330
