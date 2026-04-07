@@ -30,6 +30,7 @@ class PlayerState(TypedDict):
     id: int
     name: str
     blocked: bool
+    nb_visited_cells: int
     score: int
     speed: float
     orientation: int
@@ -57,6 +58,7 @@ class Player:
         self._orientation = 0
         self.position = (0.5, 0.5)
         self.id = 0
+        self.visited_cells: set[tuple[int, int]] = set()
 
     def reset(self) -> None:
         """Reset player state for the start of a race."""
@@ -109,6 +111,7 @@ class Player:
         delta_x = math.cos(orientation_radians) * self._speed * delta_time
         delta_y = math.sin(orientation_radians) * self._speed * delta_time
         self.position = (self.position[0] + delta_x, self.position[1] + delta_y)
+        self.visited_cells.add((int(self.position[0]), int(self.position[1])))
 
     def accelerate(self) -> str:
         """Increase player speed by 0.1 cell/s.
@@ -238,6 +241,7 @@ class Player:
             "name": self.name,
             "blocked": self.blocked,
             "score": self.score,
+            "nb_visited_cells": len(self.visited_cells),
             "speed": self._speed,
             "orientation": self._orientation,
             "position": self.position,

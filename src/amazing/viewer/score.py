@@ -51,6 +51,7 @@ class TeamData:
     color: tuple[int, int, int]
     blocked: bool
     score: int
+    nb_visited_cells: int
 
 
 class Score:
@@ -124,6 +125,13 @@ class Score:
                     team_data.color,
                     size=constants.SCORE_FONT_SIZE - 5,
                 )
+                draw_text(
+                    f"Visited Cells: {team_data.nb_visited_cells}",
+                    constants.SCORE_MARGIN,
+                    team_offset - 2 * team_size // 4,
+                    team_data.color,
+                    size=constants.SCORE_FONT_SIZE - 5,
+                )
 
     def update(self, server_data: dict) -> None:
         if server_data["time"] < MAX_EXPLORATION_DURATION_SECONDS:
@@ -138,5 +146,6 @@ class Score:
                     color=team_color(TEAM_HUES[player_data["id"] % len(TEAM_HUES)]),
                     blocked=player_data["blocked"],
                     score=player_data["score"],
+                    nb_visited_cells=player_data["nb_visited_cells"],
                 )
             )
