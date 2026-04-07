@@ -116,7 +116,7 @@ class GameServer(Server):
                     try:
                         self.write(player, self.game.manage_command(player_id, command))
                     except BlockedPlayerError as e:
-                        logger.warning("Blocked player %s attempted a command", e.name)
+                        logger.warning("Blocked player %s", e.name)
                         self.remove_client(player)
             self.game.update()
             for spectator in self.spectators:
