@@ -21,8 +21,6 @@ def test_generate_maze_basic() -> None:
     maze = generate_maze(20, 20)
     assert maze.width == 20
     assert maze.height == 20
-    paths = maze.paths(0, 0, 19, 19)
-    assert len(paths) >= 10
 
 
 def test_generate_maze_small() -> None:

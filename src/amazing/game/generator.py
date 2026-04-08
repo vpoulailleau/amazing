@@ -129,6 +129,12 @@ def generate_maze(
         else:
             maze.walls[wall.x][wall.y].left = False
 
+    for wall in possible_walls[int(len(possible_walls) * 0.85) :]:
+        if wall.is_top:
+            maze.walls[wall.x][wall.y].top = False
+        else:
+            maze.walls[wall.x][wall.y].left = False
+
     return maze
 
 
