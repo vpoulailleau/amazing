@@ -73,13 +73,12 @@ def _cell_index(x: int, y: int, width: int) -> int:
     return y * width + x
 
 
-def carve(maze: Maze, possible_walls: list[WallToRemove]) -> None:
+def carve(
+    maze: Maze,
+    possible_walls: list[WallToRemove],
+) -> None:
     """Carve walls until the target condition is reached."""
-    start_node = _cell_index(0, 0, maze.width)
-    end_node = _cell_index(maze.width - 1, maze.height - 1, maze.width)
-    min_open_edges = max(1, (maze.width * maze.height) // 3)
     dsu = DisjointSet(maze.width * maze.height)
-    open_edges = 0
     for wall in possible_walls:
         neighbors = _wall_neighbors(wall, maze.width, maze.height)
         if neighbors[0] is None or neighbors[1] is None:
@@ -96,16 +95,11 @@ def carve(maze: Maze, possible_walls: list[WallToRemove]) -> None:
             maze.walls[wall.x][wall.y].left = False
 
         dsu.union(idx_a, idx_b)
-        open_edges += 1
-
-        if dsu.find(start_node) == dsu.find(end_node) and open_edges >= min_open_edges:
-            return
 
 
 def generate_maze(
     width: int,
     height: int,
-    min_open_edges: int | None = None,
 ) -> Maze:
     """Generate a maze by random wall removals with fast connectivity heuristics.
 
@@ -113,9 +107,6 @@ def generate_maze(
         A maze where start and end are connected and at least 10 paths are targeted.
     """
     maze = Maze(width, height)
-
-    if min_open_edges is None:
-        min_open_edges = max(1, (width * height) // 3)
 
     possible_walls: list[WallToRemove] = []
     for x in range(width):

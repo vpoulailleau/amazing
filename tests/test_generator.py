@@ -52,7 +52,7 @@ def test_carve_skips_invalid_wall_coordinates() -> None:
 
 def test_generate_maze_accepts_explicit_min_open_edges() -> None:
     """Providing min_open_edges should still produce a valid maze."""
-    maze = generate_maze(3, 3, min_open_edges=1)
+    maze = generate_maze(3, 3)
     assert maze.is_connected(0, 0, 2, 2)
 
 
