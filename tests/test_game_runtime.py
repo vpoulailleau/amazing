@@ -24,6 +24,7 @@ class StubPlayer:
     def __init__(self) -> None:
         self.updated_with: list[float] = []
         self.commands: list[str] = []
+        self.finished = False
 
     def manage_command(self, command: str) -> str:
         self.commands.append(command)
@@ -32,11 +33,11 @@ class StubPlayer:
     def update(self, delta_time: float) -> None:
         self.updated_with.append(delta_time)
 
-    @staticmethod
-    def state() -> dict[str, str | bool | int | float | tuple[float, float]]:
+    def state(self) -> dict[str, str | bool | int | float | tuple[float, float]]:
         return {
             "name": "stub",
             "blocked": False,
+            "finished": self.finished,
             "score": 7,
             "speed": 0.0,
             "orientation": 0,
@@ -48,7 +49,7 @@ def test_game_constants_are_stable() -> None:
     """Game constants should keep their published values."""
     assert MAX_EXPLORATION_DURATION_SECONDS == 180
     assert MAX_RACE_DURATION_SECONDS == 60
-    assert MAX_NB_PLAYERS == 8
+    assert MAX_NB_PLAYERS == 7
     assert MAX_BLOCKED_COUNTER == 3
 
 
@@ -108,10 +109,12 @@ def test_game_update_manage_command_and_state(monkeypatch: pytest.MonkeyPatch) -
     assert game.state() == {
         "time": pytest.approx(0.25),
         "exploration": True,
+        "finished": False,
         "players": [
             {
                 "name": "stub",
                 "blocked": False,
+                "finished": False,
                 "score": 7,
                 "speed": 0.0,
                 "orientation": 0,
