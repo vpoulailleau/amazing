@@ -111,37 +111,30 @@ class Score:
             team_size = constants.SCORE_HEIGHT // (len(self.teams_data) + 1)
             team_offset = team_size + index * team_size
 
+            blocked_suffix = " [BLOCKED]" if team_data.blocked else ""
+
             draw_text(
-                team_data.name[:18],
+                team_data.name[:18] + blocked_suffix,
                 constants.SCORE_MARGIN,
                 team_offset,
                 team_data.color,
                 size=constants.SCORE_FONT_SIZE,
             )
-            if team_data.blocked:
-                draw_text(
-                    "BLOCKED",
-                    constants.SCORE_MARGIN,
-                    team_offset - team_size // 4,
-                    team_data.color,
-                    size=constants.SCORE_FONT_SIZE - 5,
-                )
-            else:
-                draw_text(
-                    f"Score: {team_data.score:.2f}",
-                    constants.SCORE_MARGIN,
-                    team_offset - team_size // 4,
-                    team_data.color,
-                    size=constants.SCORE_FONT_SIZE - 5,
-                )
-                draw_text(
-                    f"Visited Cells: {team_data.nb_visited_cells:3d}     "
-                    f"Time: {self.time_str(team_data.race_time)}",
-                    constants.SCORE_MARGIN,
-                    team_offset - 2 * team_size // 4,
-                    team_data.color,
-                    size=constants.SCORE_FONT_SIZE - 8,
-                )
+            draw_text(
+                f"Score: {team_data.score:.2f}",
+                constants.SCORE_MARGIN,
+                team_offset - team_size // 4,
+                team_data.color,
+                size=constants.SCORE_FONT_SIZE - 5,
+            )
+            draw_text(
+                f"Visited Cells: {team_data.nb_visited_cells:3d}     "
+                f"Time: {self.time_str(team_data.race_time)}",
+                constants.SCORE_MARGIN,
+                team_offset - 2 * team_size // 4,
+                team_data.color,
+                size=constants.SCORE_FONT_SIZE - 8,
+            )
 
     def update(self, server_data: dict) -> None:
         if server_data["time"] < MAX_EXPLORATION_DURATION_SECONDS:
