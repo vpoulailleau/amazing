@@ -276,3 +276,18 @@ def test_player_update_blocked_by_wall_on_cell_crossing() -> None:
 
     assert player.blocked
     assert player.position == pytest.approx((0.9, 0.5))
+
+
+def test_player_update_blocked_by_left_exterior_wall() -> None:
+    """Player cannot leave the maze through the left perimeter wall."""
+    game = Game()
+    game.maze = Maze(2, 2)
+    player = Player("alice", game)
+    player.position = (0.1, 0.5)
+    player._speed = 1.0  # noqa: SLF001
+    player._orientation = 180  # facing west  # noqa: SLF001
+
+    player.update(0.2)
+
+    assert player.blocked
+    assert player.position == pytest.approx((0.1, 0.5))

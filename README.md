@@ -1,2 +1,3 @@
 # amazing
-Course dans un labyrinthe
+
+Course dans un labyrinthe.

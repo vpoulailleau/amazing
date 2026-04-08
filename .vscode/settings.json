@@ -20,43 +20,7 @@
             "approve": true,
             "matchCommandLine": true
         },
-        "/^nl /": {
-            "approve": true,
-            "matchCommandLine": true
-        },
-        "/^printf /": {
-            "approve": true,
-            "matchCommandLine": true
-        },
-        "/^cut /": {
-            "approve": true,
-            "matchCommandLine": true
-        },
-        "/^set /": {
-            "approve": true,
-            "matchCommandLine": true
-        },
-        "/^head /": {
-            "approve": true,
-            "matchCommandLine": true
-        },
-        "/^echo /": {
-            "approve": true,
-            "matchCommandLine": true
-        },
-        "/^set /": {
-            "approve": true,
-            "matchCommandLine": true
-        },
-        "/^set /": {
-            "approve": true,
-            "matchCommandLine": true
-        },
-        "/^rg /": {
-            "approve": true,
-            "matchCommandLine": true
-        },
-        "/^grep /": {
+        "/^(cut|echo|grep|head|nl|printf|rg|set) /": {
             "approve": true,
             "matchCommandLine": true
         }

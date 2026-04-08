@@ -139,28 +139,39 @@ class Player:
         prev_position = self.position
         self.position = (self.position[0] + delta_x, self.position[1] + delta_y)
 
-        prev_cx, prev_cy = int(prev_position[0]), int(prev_position[1])
-        new_cx, new_cy = int(self.position[0]), int(self.position[1])
-        if (new_cx, new_cy) != (prev_cx, prev_cy) and self.game.maze is not None:
+        prev_cx, prev_cy = math.floor(prev_position[0]), math.floor(prev_position[1])
+        new_cx, new_cy = math.floor(self.position[0]), math.floor(self.position[1])
+        if self.game.maze is not None:
             maze = self.game.maze
             hit_wall = False
-            if new_cx != prev_cx:
-                hit_wall = hit_wall or maze.walls[max(new_cx, prev_cx)][prev_cy].left
-            if new_cy != prev_cy:
-                hit_wall = hit_wall or maze.walls[prev_cx][max(new_cy, prev_cy)].top
+            if not (
+                0 <= self.position[0] < maze.width
+                and 0 <= self.position[1] < maze.height
+            ):
+                hit_wall = True
+            elif (new_cx, new_cy) != (prev_cx, prev_cy):
+                if new_cx != prev_cx:
+                    hit_wall = (
+                        hit_wall or maze.walls[max(new_cx, prev_cx)][prev_cy].left
+                    )
+                if new_cy != prev_cy:
+                    hit_wall = hit_wall or maze.walls[prev_cx][max(new_cy, prev_cy)].top
             if hit_wall:
                 self.position = prev_position
                 self.blocked_counter = MAX_BLOCKED_COUNTER + 1
 
-        self.visited_cells.add((int(self.position[0]), int(self.position[1])))
+        self.visited_cells.add((
+            math.floor(self.position[0]),
+            math.floor(self.position[1]),
+        ))
         if not self.finished:
             self.race_time = max(
                 0, self.game.cumulated_time - MAX_EXPLORATION_DURATION_SECONDS
             )
         if (
             self.game.maze is not None
-            and int(self.position[0]) == self.game.maze.width - 1
-            and int(self.position[1]) == self.game.maze.height - 1
+            and math.floor(self.position[0]) == self.game.maze.width - 1
+            and math.floor(self.position[1]) == self.game.maze.height - 1
         ):
             self.finished = True
 
