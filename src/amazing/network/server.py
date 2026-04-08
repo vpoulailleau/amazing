@@ -20,6 +20,7 @@ class ClientData:
     spectator: bool
     name: str
     network: DataHandler
+    player_id: int | None = None
 
     def __eq__(self: ClientData, other: object) -> bool:
         """Compare two clients by their underlying network handler identity.

@@ -77,15 +77,20 @@ class Game:
             return "BLOCKED"
         return self.players[player_id].manage_command(command)
 
-    def add_player(self, player_name: str) -> None:
-        """Add a player when the server still has room."""
+    def add_player(self, player_name: str) -> int | None:
+        """Add a player when the server still has room.
+
+        Returns:
+            Assigned player id, or None when the game is full.
+        """
         if len(self.players) >= MAX_NB_PLAYERS:
-            return
+            return None
         player = Player(player_name, self)
         self.players.append(player)
         self.players.sort(key=lambda player: player.name)
         for index, player in enumerate(self.players):
             player.id = index
+        return player.id
 
     def update(self) -> None:
         """Advance timers and update every active player."""

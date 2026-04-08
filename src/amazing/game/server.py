@@ -32,7 +32,7 @@ class GameServer(Server):
         self.game = Game()
         self._wait_connections()
         for player in self.players:
-            self.game.add_player(player.name)
+            player.player_id = self.game.add_player(player.name)
 
     @property
     def players(self) -> list[ClientData]:
@@ -46,11 +46,16 @@ class GameServer(Server):
 
     def remove_client(self: GameServer, client: ClientData) -> None:
         """Remove a client and mark its player as blocked when relevant."""
-        self.clients.remove(client)
-        if not client.spectator:
-            for player in self.game.players:
-                if player.name == client.name:
-                    player.blocked_counter = MAX_BLOCKED_COUNTER + 1
+        if client in self.clients:
+            self.clients.remove(client)
+        if (
+            not client.spectator
+            and client.player_id is not None
+            and client.player_id < len(self.game.players)
+        ):
+            self.game.players[client.player_id].blocked_counter = (
+                MAX_BLOCKED_COUNTER + 1
+            )
 
     def _wait_connections(self: GameServer) -> None:
         """Wait for at least one player and then a short join window."""
@@ -108,13 +113,20 @@ class GameServer(Server):
             start = perf_counter()
             while perf_counter() - start < FRAME_WINDOW_SECONDS:
                 # TODO one command per player at a time, until exhausted or 0.0033s
-                for player_id, player in enumerate(self.players):
+                for player in self.players:
                     if player.network.input_empty():
                         continue
                     command = self.read(player)
                     logger.debug("Command [%s] %s", player.name, command)
+                    if player.player_id is None:
+                        logger.warning("Client %s has no player id", player.name)
+                        self.remove_client(player)
+                        continue
                     try:
-                        self.write(player, self.game.manage_command(player_id, command))
+                        self.write(
+                            player,
+                            self.game.manage_command(player.player_id, command),
+                        )
                     except BlockedPlayerError as e:
                         logger.warning("Blocked player %s", e.name)
                         self.remove_client(player)
