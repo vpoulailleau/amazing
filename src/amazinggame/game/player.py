@@ -8,6 +8,7 @@ from amazinggame.game.constants import (
     MAX_BLOCKED_COUNTER,
     MAX_EXPLORATION_DURATION_SECONDS,
     MAX_RACE_DURATION_SECONDS,
+    WALL_BLOCK_DURATION_SECONDS,
 )
 
 if TYPE_CHECKING:
@@ -63,6 +64,8 @@ class Player:
         self.visited_cells: set[tuple[int, int]] = set()
         self.finished = False
         self.race_time: float = 0.0
+        self.wall_blocked_until: float = 0.0
+        self._prev_position: tuple[float, float] = self.position
 
     def reset(self) -> None:
         """Reset player state for the start of a race."""
@@ -71,11 +74,20 @@ class Player:
         self._orientation = 0
         self.position = (0.5, 0.5)
         self.finished = False
+        self.wall_blocked_until = 0.0
 
     @property
     def blocked(self) -> bool:
-        """Return whether the player is blocked after repeated invalid commands."""
+        """Return whether the player is permanently blocked.
+
+        Returns True after repeated invalid commands.
+        """
         return self.blocked_counter > MAX_BLOCKED_COUNTER
+
+    @property
+    def wall_blocked(self) -> bool:
+        """Return whether the player is temporarily blocked after hitting a wall."""
+        return self.game.cumulated_time < self.wall_blocked_until
 
     @property
     def score(self) -> float:
@@ -110,16 +122,18 @@ class Player:
         """
         if self.blocked:
             raise BlockedPlayerError(self.name)
-        command = command_str.split()
+        command = command_str.split(maxsplit=1)[0]
+        if self.wall_blocked and command != "GET_SENSORS":
+            return "BLOCKED"
         try:
-            if command[0] in {
+            if command in {
                 "ACCELERATE",
                 "DECELERATE",
                 "TURN_RIGHT",
                 "TURN_LEFT",
                 "GET_SENSORS",
             }:
-                return getattr(self, command[0].lower())()
+                return getattr(self, command.lower())()
             _raise_unknown_command(command_str)
         except ValueError as e:
             logger.warning("Problem for %s: %s", self.name, e)
@@ -127,6 +141,33 @@ class Player:
             if self.blocked:
                 raise BlockedPlayerError(self.name) from e
             return "KO"
+
+    def _check_wall_collision(self) -> bool:
+        """Return True and revert position if the current move hits a wall.
+
+        Returns:
+            True when the player has hit a wall.
+        """
+        if self.game.maze is None:
+            return False
+        maze = self.game.maze
+        if not (
+            0 <= self.position[0] < maze.width and 0 <= self.position[1] < maze.height
+        ):
+            return True
+        prev_cx, prev_cy = (
+            math.floor(self._prev_position[0]),
+            math.floor(self._prev_position[1]),
+        )
+        new_cx, new_cy = math.floor(self.position[0]), math.floor(self.position[1])
+        if (new_cx, new_cy) == (prev_cx, prev_cy):
+            return False
+        hit_wall = False
+        if new_cx != prev_cx:
+            hit_wall = hit_wall or maze.walls[max(new_cx, prev_cx)][prev_cy].left
+        if new_cy != prev_cy:
+            hit_wall = hit_wall or maze.walls[prev_cx][max(new_cy, prev_cy)].top
+        return hit_wall
 
     def update(self, delta_time: float) -> None:
         """Update runtime player state for one frame."""
@@ -136,33 +177,21 @@ class Player:
             )
         if self.blocked:
             return
+        if self.wall_blocked:
+            self._speed = 0.0
+            return
 
         orientation_radians = math.radians(-self._orientation)
         delta_x = math.cos(orientation_radians) * self._speed * delta_time
         delta_y = math.sin(orientation_radians) * self._speed * delta_time
-        prev_position = self.position
+        self._prev_position = self.position
         self.position = (self.position[0] + delta_x, self.position[1] + delta_y)
 
-        prev_cx, prev_cy = math.floor(prev_position[0]), math.floor(prev_position[1])
-        new_cx, new_cy = math.floor(self.position[0]), math.floor(self.position[1])
-        if self.game.maze is not None:
-            maze = self.game.maze
-            hit_wall = False
-            if not (
-                0 <= self.position[0] < maze.width
-                and 0 <= self.position[1] < maze.height
-            ):
-                hit_wall = True
-            elif (new_cx, new_cy) != (prev_cx, prev_cy):
-                if new_cx != prev_cx:
-                    hit_wall = (
-                        hit_wall or maze.walls[max(new_cx, prev_cx)][prev_cy].left
-                    )
-                if new_cy != prev_cy:
-                    hit_wall = hit_wall or maze.walls[prev_cx][max(new_cy, prev_cy)].top
-            if hit_wall:
-                self.position = prev_position
-                self.blocked_counter = MAX_BLOCKED_COUNTER + 1
+        if self._check_wall_collision():
+            self.position = self._prev_position
+            self.wall_blocked_until = (
+                self.game.cumulated_time + WALL_BLOCK_DURATION_SECONDS
+            )
 
         self.visited_cells.add((
             math.floor(self.position[0]),
@@ -301,7 +330,7 @@ class Player:
         return {
             "id": self.id,
             "name": self.name,
-            "blocked": self.blocked,
+            "blocked": self.blocked or self.wall_blocked,
             "score": self.score,
             "nb_visited_cells": self.nb_visited_cells,
             "speed": self._speed,

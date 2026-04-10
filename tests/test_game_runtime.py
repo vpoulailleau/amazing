@@ -12,6 +12,7 @@ from amazinggame.game.constants import (
     MAX_EXPLORATION_DURATION_SECONDS,
     MAX_NB_PLAYERS,
     MAX_RACE_DURATION_SECONDS,
+    WALL_BLOCK_DURATION_SECONDS,
 )
 from amazinggame.game.game import Game
 from amazinggame.game.maze import Maze
@@ -294,8 +295,8 @@ def test_player_update_crosses_open_wall_unhindered() -> None:
 
 
 def test_player_update_blocked_by_wall_on_cell_crossing() -> None:
-    """Player hitting a wall when crossing into a new cell should be blocked and
-    reverted."""
+    """Player hitting a wall when crossing into a new cell should be wall-blocked
+    temporarily and reverted."""
     game = Game()
     game.maze = Maze(2, 2)
     # walls[1][0].left is True by default: wall between (0,0) and (1,0)
@@ -306,7 +307,8 @@ def test_player_update_blocked_by_wall_on_cell_crossing() -> None:
 
     player.update(0.2)  # would cross into (1,0) but there is a wall
 
-    assert player.blocked
+    assert player.wall_blocked
+    assert not player.blocked
     assert player.position == pytest.approx((0.9, 0.5))
 
 
@@ -321,5 +323,61 @@ def test_player_update_blocked_by_left_exterior_wall() -> None:
 
     player.update(0.2)
 
-    assert player.blocked
+    assert player.wall_blocked
+    assert not player.blocked
     assert player.position == pytest.approx((0.1, 0.5))
+
+
+def test_player_wall_blocked_prevents_movement() -> None:
+    """A wall-blocked player should not move during the block period."""
+    game = Game()
+    game.maze = Maze(2, 2)
+    player = Player("alice", game)
+    player.position = (0.9, 0.5)
+    player._speed = 1.0  # noqa: SLF001
+    player._orientation = 0  # noqa: SLF001
+
+    player.update(0.2)  # hit the wall, now wall_blocked
+    pos_after_block = player.position
+
+    player.update(0.1)  # still wall_blocked, should not move
+
+    assert player.position == pos_after_block
+    assert player.wall_blocked
+
+
+def test_player_wall_blocked_command_returns_blocked_string() -> None:
+    """Commands sent during a wall block should return BLOCKED without disconnecting."""
+    game = Game()
+    game.maze = Maze(2, 2)
+    player = Player("alice", game)
+    player.wall_blocked_until = game.cumulated_time + WALL_BLOCK_DURATION_SECONDS
+
+    result = player.manage_command("ACCELERATE")
+
+    assert result == "BLOCKED"
+    assert player.wall_blocked
+
+
+def test_player_wall_unblocked_after_duration() -> None:
+    """Player should be free to move again once the wall block expires."""
+    game = Game()
+    game.maze = Maze(2, 2)
+    player = Player("alice", game)
+    player.wall_blocked_until = 10.0  # block expires at t=10
+    game.cumulated_time = 11.0  # advance past expiry
+
+    assert not player.wall_blocked
+    assert player.manage_command("ACCELERATE") == "OK"
+
+
+def test_player_reset_clears_wall_block() -> None:
+    """Resetting a player should clear the wall block."""
+    game = Game()
+    player = Player("alice", game)
+    player.wall_blocked_until = 999.0
+
+    player.reset()
+
+    assert not player.wall_blocked
+    assert player.wall_blocked_until == pytest.approx(0.0)

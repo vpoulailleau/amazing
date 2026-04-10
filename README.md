@@ -42,10 +42,16 @@ Réponses typiques :
 
 - `OK` : commande acceptée
 - `KO` : commande invalide
+- `BLOCKED` : commande reçue mais le joueur ne peut pas agir en ce moment
 
-Un joueur est bloqué pour toujours après trop d'erreurs de commandes.
+### Blocages
 
-En cas de collision sévère, il est bloqué 10 secondes.
+| Cause                             | Durée       | Effet                                            |
+| --------------------------------- | ----------- | ------------------------------------------------ |
+| Trop d'erreurs de commandes (> 3) | Permanent   | Joueur déconnecté par le serveur                 |
+| Collision avec un mur             | 10 secondes | Le joueur reprend automatiquement après la pause |
+
+Pendant un blocage temporaire (mur), les commandes reçoivent `BLOCKED` en réponse mais le joueur **n'est pas déconnecté** et reprend normalement à la fin de la pause.
 
 ## Format des capteurs (`GET_SENSORS`)
 
