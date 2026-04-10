@@ -33,6 +33,9 @@ class StubPlayer:
     def update(self, delta_time: float) -> None:
         self.updated_with.append(delta_time)
 
+    def reset(self) -> None:
+        self.commands.append("RESET")
+
     def state(self) -> dict[str, str | bool | int | float | tuple[float, float]]:
         return {
             "name": "stub",
@@ -93,6 +96,21 @@ def test_game_add_player_respects_limit(monkeypatch: pytest.MonkeyPatch) -> None
     assert [player.name for player in game.players] == ["alice"]
 
 
+def test_game_add_player_keeps_assigned_ids_stable() -> None:
+    """Player IDs should remain stable even when later names sort earlier."""
+    game = Game()
+
+    bob_id = game.add_player("bob")
+    alice_id = game.add_player("alice")
+
+    assert bob_id == 0
+    assert alice_id == 1
+    assert [(player.name, player.id) for player in game.players] == [
+        ("bob", 0),
+        ("alice", 1),
+    ]
+
+
 def test_game_update_manage_command_and_state(monkeypatch: pytest.MonkeyPatch) -> None:
     """Game should update players and expose a serializable state."""
     game = Game()
@@ -123,6 +141,20 @@ def test_game_update_manage_command_and_state(monkeypatch: pytest.MonkeyPatch) -
         ],
         "maze": None,
     }
+
+
+def test_game_start_race_disables_exploration_and_resets_players() -> None:
+    """Starting race should flip phase and reset all players."""
+    game = Game()
+    first = cast("Player", StubPlayer())
+    second = cast("Player", StubPlayer())
+    game.players = [first, second]
+
+    game.start_race()
+
+    assert game.exploration_phase is False
+    assert first.commands[-1] == "RESET"
+    assert second.commands[-1] == "RESET"
 
 
 @pytest.mark.parametrize(

@@ -87,10 +87,8 @@ class Game:
         if len(self.players) >= MAX_NB_PLAYERS:
             return None
         player = Player(player_name, self)
+        player.id = len(self.players)
         self.players.append(player)
-        self.players.sort(key=lambda player: player.name)
-        for index, player in enumerate(self.players):
-            player.id = index
         return player.id
 
     def update(self) -> None:
