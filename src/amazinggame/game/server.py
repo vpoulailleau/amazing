@@ -112,7 +112,6 @@ class GameServer(Server):
         while True:
             start = perf_counter()
             while perf_counter() - start < FRAME_WINDOW_SECONDS:
-                # TODO one command per player at a time, until exhausted or 0.0033s
                 for player in self.players:
                     if player.network.input_empty():
                         continue
