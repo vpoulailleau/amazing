@@ -88,7 +88,6 @@ class Window(arcade.Window):
                     date_server,
                     exploration=data["exploration"],
                 )
-            # logger.info("Received state update with players: %s", data["players"]) # noqa: ERA001
 
         self.clear()
         self.background_sprites.draw()

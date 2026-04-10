@@ -1,3 +1,5 @@
+"""Scoreboard rendering helpers for the Arcade viewer."""
+
 from dataclasses import dataclass
 from functools import lru_cache
 from importlib.resources import files
@@ -12,10 +14,15 @@ from amazinggame.viewer.constants import TEAM_HUES, constants, team_color
 def get_texts(
     text: str, x: int, y: int, color: tuple[int, int, int], size: int
 ) -> list[arcade.Text]:
+    """Build text objects with a simple outline effect.
+
+    Returns:
+        Cached text objects for one outlined label.
+    """
     texts: list[arcade.Text] = []
     for offset_x in (-1, 1):
         for offset_y in (-1, 1):
-            texts.append(
+            texts.extend([
                 arcade.Text(
                     text,
                     x + offset_x,
@@ -24,7 +31,7 @@ def get_texts(
                     font_size=size,
                     font_name="Fira Code",
                 )
-            )
+            ])
     texts.append(
         arcade.Text(
             text,
@@ -41,12 +48,15 @@ def get_texts(
 def draw_text(
     text: str, x: int, y: int, color: tuple[int, int, int], size: int
 ) -> None:
+    """Draw cached text with outline."""
     for predrawn_text in get_texts(text, x, y, color, size):
         predrawn_text.draw()
 
 
 @dataclass(frozen=True)
 class TeamData:
+    """Immutable values displayed for one team."""
+
     name: str
     color: tuple[int, int, int]
     blocked: bool
@@ -56,7 +66,10 @@ class TeamData:
 
 
 class Score:
-    def __init__(self, addr: str, port: int):
+    """Render and update score panel contents."""
+
+    def __init__(self, addr: str, port: int) -> None:
+        """Create a score panel bound to a server address."""
         self.teams_data: list[TeamData] = []
         self.port = port
         self.addr = addr
@@ -64,6 +77,7 @@ class Score:
         self.shape_list = arcade.shape_list.ShapeElementList()
 
     def setup(self) -> None:
+        """Load font and background panel shape."""
         font_file = files("amazinggame.viewer.resources.fonts").joinpath(
             "FiraCode-Bold.ttf"
         )
@@ -82,10 +96,17 @@ class Score:
 
     @staticmethod
     def time_str(seconds: float) -> str:
+        """Format seconds as `M:SS.CC`.
+
+        Returns:
+            The formatted time string.
+        """
         minutes, seconds = divmod(seconds, 60)
-        return f"{int(minutes)}:{int(seconds):02d}.{int((seconds - int(seconds)) * 100):02d}"
+        centiseconds = int((seconds - int(seconds)) * 100)
+        return f"{int(minutes)}:{int(seconds):02d}.{centiseconds:02d}"
 
     def draw(self) -> None:
+        """Draw the score panel and all team rows."""
         self.shape_list.draw()
         draw_text(
             f"Time: {self.time_str(self.time)}",
@@ -137,6 +158,7 @@ class Score:
             )
 
     def update(self, server_data: dict) -> None:
+        """Refresh score state from one server payload."""
         if server_data["time"] < MAX_EXPLORATION_DURATION_SECONDS:
             self.time = MAX_EXPLORATION_DURATION_SECONDS - server_data["time"]
         else:

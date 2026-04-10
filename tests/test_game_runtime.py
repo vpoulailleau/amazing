@@ -114,8 +114,8 @@ def test_game_add_player_keeps_assigned_ids_stable() -> None:
 def test_game_update_manage_command_and_state(monkeypatch: pytest.MonkeyPatch) -> None:
     """Game should update players and expose a serializable state."""
     game = Game()
-    stub_player = cast("Player", StubPlayer())
-    game.players = [stub_player]
+    stub_player = StubPlayer()
+    game.players = cast("list[Player]", [stub_player])
     game.last_update_time = 1.0
     monkeypatch.setattr(game_module, "perf_counter", lambda: 1.25)
 
@@ -146,9 +146,9 @@ def test_game_update_manage_command_and_state(monkeypatch: pytest.MonkeyPatch) -
 def test_game_start_race_disables_exploration_and_resets_players() -> None:
     """Starting race should flip phase and reset all players."""
     game = Game()
-    first = cast("Player", StubPlayer())
-    second = cast("Player", StubPlayer())
-    game.players = [first, second]
+    first = StubPlayer()
+    second = StubPlayer()
+    game.players = cast("list[Player]", [first, second])
 
     game.start_race()
 

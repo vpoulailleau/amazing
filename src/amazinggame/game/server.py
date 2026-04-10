@@ -107,31 +107,58 @@ class GameServer(Server):
             logger.exception("Problem sending state to client")
             self.remove_client(client)
 
+    def _handle_player_command(self, player: ClientData, command: str) -> None:
+        """Execute one player command and return result to the player."""
+        logger.debug("Command [%s] %s", player.name, command)
+        if player.player_id is None:
+            logger.warning("Client %s has no player id", player.name)
+            self.remove_client(player)
+            return
+        try:
+            self.write(
+                player,
+                self.game.manage_command(player.player_id, command),
+            )
+        except BlockedPlayerError as error:
+            logger.warning("Blocked player %s", error.name)
+            self.remove_client(player)
+
+    def _process_player_inputs(self, start: float) -> None:
+        """Process player inputs for one frame window."""
+        while perf_counter() - start < FRAME_WINDOW_SECONDS:
+            for player in self.players:
+                if player.network.input_empty():
+                    continue
+                command = self.read(player)
+                self._handle_player_command(player, command)
+
+    def _should_stop(self) -> bool:
+        """Return True when race should stop and log the reason."""
+        if (
+            self.game.cumulated_time
+            > MAX_EXPLORATION_DURATION_SECONDS + MAX_RACE_DURATION_SECONDS
+        ):
+            logger.info("Reached time limit for the race")
+            return True
+
+        if self.game.finished and not self.game.exploration_phase:
+            logger.info("A player won the game")
+            return True
+
+        return False
+
+    def _update_spectators(self) -> None:
+        """Send current game state to spectators."""
+        for spectator in self.spectators:
+            self.write(spectator, json.dumps(self.game.state()))
+
     def run(self: GameServer) -> None:
         """Run the game loop until the game ends or time expires."""
         while True:
             start = perf_counter()
-            while perf_counter() - start < FRAME_WINDOW_SECONDS:
-                for player in self.players:
-                    if player.network.input_empty():
-                        continue
-                    command = self.read(player)
-                    logger.debug("Command [%s] %s", player.name, command)
-                    if player.player_id is None:
-                        logger.warning("Client %s has no player id", player.name)
-                        self.remove_client(player)
-                        continue
-                    try:
-                        self.write(
-                            player,
-                            self.game.manage_command(player.player_id, command),
-                        )
-                    except BlockedPlayerError as e:
-                        logger.warning("Blocked player %s", e.name)
-                        self.remove_client(player)
+            self._process_player_inputs(start)
             self.game.update()
-            for spectator in self.spectators:
-                self.write(spectator, json.dumps(self.game.state()))
+            self._update_spectators()
 
             if (
                 self.game.cumulated_time > MAX_EXPLORATION_DURATION_SECONDS
@@ -140,15 +167,7 @@ class GameServer(Server):
                 logger.info("Reached time limit for the exploration")
                 self.game.start_race()
 
-            if (
-                self.game.cumulated_time
-                > MAX_EXPLORATION_DURATION_SECONDS + MAX_RACE_DURATION_SECONDS
-            ):
-                logger.info("Reached time limit for the race")
-                break
-
-            if self.game.finished and not self.game.exploration_phase:
-                logger.info("A player won the game")
+            if self._should_stop():
                 break
         sys.exit(0)
 
