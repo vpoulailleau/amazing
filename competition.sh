@@ -22,5 +22,5 @@ uv run python /home/vincent/Documents/programmation/amazing_player/sample_player
 gcc -Wall -o sample_player_client sample_player_client.c
 ./sample_player_client "localhost" $PORT "SamplePlayer" &
 
-sleep 330
+sleep 500
 uv run python -m amazinggame.killall
