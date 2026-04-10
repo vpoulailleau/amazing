@@ -77,7 +77,8 @@ class Window(arcade.Window):
                 self.maze.setup()
                 self._maze_loaded_from_server = True
 
-            for player_id, state in enumerate(data["players"]):
+            for state in data["players"]:
+                player_id = int(state["id"])
                 if player_id not in self.players:
                     self.players[player_id] = Player(self.dot_list)
                     self.players_sprite_list.append(self.players[player_id].sprite)
