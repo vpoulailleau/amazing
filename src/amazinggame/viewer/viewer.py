@@ -21,7 +21,7 @@ def network_thread(server_addr: str, port: int) -> None:
         except NetworkError:
             logger.exception("End of network communication")
             break
-    for _ in range(6):
+    for _ in range(12):
         sleep(10)
         logger.info("sleeping")
 
