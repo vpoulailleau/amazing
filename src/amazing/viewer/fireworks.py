@@ -7,7 +7,7 @@ from arcade.experimental.shadertoy import Shadertoy
 import amazing.viewer.resources
 from amazing.viewer.constants import constants
 
-ANIMATION_DURATION_SECONDS = 1.0
+ANIMATION_DURATION_SECONDS = 1.5
 
 
 class Firework:
