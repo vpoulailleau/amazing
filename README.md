@@ -142,3 +142,27 @@ Exécuter la suite de vérification complète :
 ```bash
 prek run --all-files
 ```
+
+## Auto-évaluation
+
+Voici un barème pour évaluer le projet :
+
+| Critère                                                           | Points |
+| ----------------------------------------------------------------- | ------ |
+| Structures de données                                             | 4      |
+| Gestion des commandes basiques                                    | 1      |
+| Utilisation intelligente des capteurs                             | 2      |
+| Reconstruction de la carte du labyrinthe                          | 3      |
+| Algorithme de path finding                                        | 4      |
+| Robustesse à la communication avec le serveur                     | 1      |
+| Performance (complexité algorithmique)                            | 1      |
+| Documentation (installation des dépendances, lancement)           | 1      |
+| Écriture de tests pertinents                                      | 4      |
+| Qualimétrie                                                       | 1      |
+| Automatisation avec GitHub action                                 | 2      |
+| Refus de pull request / push si baisse de qualité ou tests KO     | 1      |
+| Classement compétition                                            | 3      |
+| Pre-commit en local et en intégration continue                    | 1      |
+| Rapport : démarche étape par étape                                | 3      |
+| Rapport : 3 plus grandes difficultés, et solutions mises en place | 6      |
+| Rapport : notions apprises, retour d'expérience                   | 1      |
