@@ -68,23 +68,17 @@ avec (les nombres à virgules ont deux décimales) :
 - `speed` vitesse courante en largeur de cellule par seconde (à virgule)
 - `front/right/rear/left` distances aux murs (à virgule)
 
-## Installation et pre-requis
+## Pré-requis d'utilisation
 
 - Python `>= 3.14`
 - `uv`
-
-Installation locale :
-
-```bash
-uv sync
-```
 
 ## Commandes utiles
 
 ### Lancer un serveur de jeu
 
 ```bash
-uv run python -m amazinggame.game.server
+uvx --from amazinggame server
 ```
 
 Options principales :
@@ -97,13 +91,13 @@ Options principales :
 Exemple:
 
 ```bash
-uv run python -m amazinggame.game.server -p 16210 -t 10
+uvx --from amazinggame server -p 16210 -t 10
 ```
 
 ### Lancer le viewer (spectateur graphique)
 
 ```bash
-uv run python -m amazinggame.viewer -p 16210
+uvx --from amazinggame viewer -p 16210
 ```
 
 Options:
