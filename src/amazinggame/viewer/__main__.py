@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 def main() -> None:
+    """Main entrypoint for launching the viewer."""
     parser = argparse.ArgumentParser(description="Game client.")
     parser.add_argument(
         "-a",
@@ -33,8 +34,8 @@ def main() -> None:
         encoding="utf-8",
         level=logging.INFO,
         format=(
-            "%(asctime)s [%(levelname)-8s] %(filename)20s(%(lineno)3s):%(funcName)-20s :: "
-            "%(message)s"
+            "%(asctime)s [%(levelname)-8s] %(filename)20s(%(lineno)3s):%(funcName)-20s"
+            " :: %(message)s"
         ),
         datefmt="%m/%d/%Y %H:%M:%S",
     )

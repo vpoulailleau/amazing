@@ -6,6 +6,7 @@ import psutil
 
 
 def main() -> None:
+    """Main entrypoint for killing running Amazinggame-related Python processes."""
     teams = ["player.player"]
 
     for process in psutil.process_iter():

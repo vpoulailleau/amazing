@@ -175,6 +175,7 @@ class GameServer(Server):
 
 
 def main() -> None:
+    """Main entrypoint for launching the server."""
     parser = argparse.ArgumentParser(description="Game server.")
     parser.add_argument(
         "-a",
