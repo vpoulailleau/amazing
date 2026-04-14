@@ -18,7 +18,6 @@ from amazinggame.game.player import BlockedPlayerError
 from amazinggame.network.data_handler import NetworkError
 from amazinggame.network.server import ClientData, Server
 
-server_connection_timeout = 10
 FRAME_WINDOW_SECONDS = 0.033
 logger = logging.getLogger(__name__)
 
@@ -26,9 +25,12 @@ logger = logging.getLogger(__name__)
 class GameServer(Server):
     """Host a maze game and synchronize connected clients."""
 
-    def __init__(self: GameServer, host: str, port: int) -> None:
+    def __init__(
+        self: GameServer, host: str, port: int, connection_timeout: int
+    ) -> None:
         """Start the server, wait for players, then initialize the game."""
         super().__init__(host, port)
+        self.connection_timeout = connection_timeout
         self.game = Game()
         self._wait_connections()
         for player in self.players:
@@ -63,12 +65,12 @@ class GameServer(Server):
             logger.info("Waiting for player clients")
             sleep(1)
 
-        for second in range(1, server_connection_timeout + 1):
+        for second in range(1, self.connection_timeout + 1):
             names = [player.name for player in self.players]
             logger.info(
                 "Waiting other players (%s/%s) %s",
                 second,
-                server_connection_timeout,
+                self.connection_timeout,
                 names,
             )
             if len(self.players) == MAX_NB_PLAYERS:
@@ -172,7 +174,7 @@ class GameServer(Server):
         sys.exit(0)
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(description="Game server.")
     parser.add_argument(
         "-a",
@@ -198,12 +200,11 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    server_connection_timeout = args.timeout
 
     if args.fast:
         logging.basicConfig(handlers=[logging.NullHandler()])
         with contextlib.redirect_stdout(None), contextlib.redirect_stderr(None):
-            GameServer(args.address, args.port).run()
+            GameServer(args.address, args.port, args.timeout).run()
     else:
         log_format = (
             "%(asctime)s [%(levelname)-8s] %(filename)20s(%(lineno)3s):"
@@ -229,4 +230,8 @@ if __name__ == "__main__":
         root_logger.addHandler(console_handler)
 
         logger.info("Launching server")
-        GameServer(args.address, args.port).run()
+        GameServer(args.address, args.port, args.timeout).run()
+
+
+if __name__ == "__main__":
+    main()
