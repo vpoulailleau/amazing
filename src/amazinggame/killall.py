@@ -11,7 +11,15 @@ launch_commands = [
     "viewer",
     "server",
 ]
-selectors = ["player.player", "sample_player", "server", "viewer"]
+selectors = [
+    "player.player",
+    "sample_player",
+    "uv run viewer",
+    ".venv/bin/viewer",
+    "uv run server",
+    ".venv/bin/server",
+    "uvx --from amazinggame",
+]
 
 
 def main() -> None:
