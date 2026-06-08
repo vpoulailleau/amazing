@@ -11,7 +11,7 @@ uvx --from amazinggame viewer -p $PORT &
 #uv run python -m amazinggame.viewer -p $PORT --small-window &
 sleep 2
 
-uv run python /home/vincent/Documents/programmation/amazing_player/sample_player_client.py -p $PORT -u "Flash" --winner &
+uv run python /home/vincent/Documents/programmation/amazing_player/winner.py -p $PORT -u "Flash" &
 
-sleep 500
+sleep 600
 uvx --from amazinggame killall

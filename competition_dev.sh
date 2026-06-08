@@ -11,7 +11,7 @@ uv run viewer -p $PORT &
 #uv run viewer -p $PORT --small-window &
 sleep 2
 
-uv run python /home/vincent/Documents/programmation/amazing_player/sample_player_client.py -p $PORT -u "Flash" --winner &
+uv run python /home/vincent/Documents/programmation/amazing_player/winner.py -p $PORT -u "Flash" &
 sleep 1
 uv run python /home/vincent/Documents/programmation/amazing_player/sample_player_client.py -p $PORT -u "KITT" &
 uv run python /home/vincent/Documents/programmation/amazing_player/sample_player_client.py -p $PORT -u "Optimus Prime" &
@@ -22,5 +22,5 @@ uv run python /home/vincent/Documents/programmation/amazing_player/sample_player
 gcc -Wall -o sample_player_client sample_player_client.c
 ./sample_player_client "localhost" $PORT "SamplePlayer" &
 
-sleep 500
+sleep 600
 uv run killall
