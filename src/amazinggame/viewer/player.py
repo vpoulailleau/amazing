@@ -39,7 +39,7 @@ class Player:
 
     def dot_color(self) -> tuple[int, int, int, int]:
         """Return the RGBA color for the position trace dots."""
-        return (*self.color, 20)
+        return (*self.color, 150)
 
     def update_from_state(
         self,
@@ -97,10 +97,6 @@ class Player:
                 self.dot_color(),
             )
             self.shape_list.append(circle)
-
-    def draw_trace(self) -> None:
-        """Draw the shape list containing trace circles."""
-        self.shape_list.draw()
 
     def draw_explosion(self) -> None:
         """Draw the explosion animation."""

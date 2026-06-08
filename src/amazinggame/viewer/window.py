@@ -92,8 +92,6 @@ class Window(arcade.Window):
         self.clear()
         self.background_sprites.draw()
         self.maze.draw()
-        for player in self.players.values():
-            player.draw_trace()
         self.dot_list.draw()
         self.players_sprite_list.draw()
         self.score.draw()
