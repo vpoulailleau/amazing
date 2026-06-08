@@ -30,8 +30,10 @@ def main() -> None:
             if not any(cmd in line for cmd in launch_commands):
                 continue
             print("testing", line)  # noqa: T201
-            if any(selector in line for selector in selectors) and (
-                "killall" not in line
+            if (
+                process.is_running()
+                and any(selector in line for selector in selectors)
+                and ("killall" not in line)
             ):
                 print("    killing process:", line)  # noqa: T201
                 process.kill()
