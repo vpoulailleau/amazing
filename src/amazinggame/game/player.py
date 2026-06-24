@@ -189,6 +189,7 @@ class Player:
 
         if self._check_wall_collision():
             self.position = self._prev_position
+            self._speed = 0.0
             self.wall_blocked_until = (
                 self.game.cumulated_time + WALL_BLOCK_DURATION_SECONDS
             )
