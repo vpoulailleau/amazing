@@ -102,10 +102,14 @@ class DataHandler:
 
         Raises:
             NetworkError: If the remote side has closed the connection.
+            ValueError: If the message does not end with a newline.
         """
+        if not message.endswith("\n"):
+            msg = "Message must end with a newline."
+            raise ValueError(msg)
         logger.debug("write %s", message[:100])
         try:
-            self.socket.send(bytes(message, "utf8"))
+            self.socket.sendall(bytes(message, "utf8"))
         except BrokenPipeError as exc:
             raise NetworkError from exc
 
