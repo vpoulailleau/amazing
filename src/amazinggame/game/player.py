@@ -123,7 +123,7 @@ class Player:
         if self.blocked:
             raise BlockedPlayerError(self.name)
         command = command_str.split(maxsplit=1)[0]
-        if self.wall_blocked and command != "GET_SENSORS":
+        if self.wall_blocked and command in {"ACCELERATE", "DECELERATE"}:
             return "BLOCKED"
         try:
             if command in {
